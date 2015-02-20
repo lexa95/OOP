@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 	if (inFile == NULL)
 	{
 		printf("File opening error\n");
-		_getch(); 
+		_getch();
 		return 1;
 	}
 
@@ -86,12 +86,12 @@ int main(int argc, char* argv[])
 		_getch();
 		return 1;
 	}
-	
+
 	ReplacementString(inFile, outFile, argv[3], argv[4]);
-	
+
 	fclose(inFile);
 	fclose(outFile);
-	
+
 	_getch();
 	return 0;
 }
