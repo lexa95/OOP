@@ -10,7 +10,7 @@ int StringToInt(const char * str, bool & err)
 	return param;
 }
 
-unsigned RevByte(unsigned char x)
+unsigned char RevByte(unsigned char x)
 {
 	x = (x & 0x55) << 1 | (x >> 1) & 0x55;
 	x = (x & 0x33) << 2 | (x >> 2) & 0x33;
@@ -27,6 +27,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	bool err;
+
 	int num = StringToInt(argv[1], err);
 	if (err)
 	{
@@ -42,7 +43,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	unsigned char val = num;
-	std::cout << RevByte(val) << std::endl;
+
+	std::cout << int(RevByte(val)) << std::endl;
 	_getch();
 	return 0;
 }
