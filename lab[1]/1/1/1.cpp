@@ -11,7 +11,7 @@ int strcmp(const char*, const char*);
 
 void AddCharacterInString(char * line, char symbol)
 { 
-	for (int i(0); i <= strlen(line); i++)
+	for (int i = 0; i <= strlen(line); i++)
 	{
 		if (line[i] == '\0')
 		{

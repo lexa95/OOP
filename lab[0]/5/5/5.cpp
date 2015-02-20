@@ -40,11 +40,15 @@ double InputNumber(const char* line, bool & err)
 		cout << line;
 		cin >> str;
 		result = StringToDouble(str.c_str(), err);
-		if (err && !IsExit(str.c_str()))
+		if (result < 0)
+		{
+			cout << "number must be greater than zero" << endl;
+		}
+		else if (err && !IsExit(str.c_str()))
 		{
 			cout << "Incorrect number." << endl;
 		}
-	} while (err && !IsExit(str.c_str()));
+	} while (err && !IsExit(str.c_str()) || result < 0);
 
 	err = IsExit(str.c_str());
 	return result;
