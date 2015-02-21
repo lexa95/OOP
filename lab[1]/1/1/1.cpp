@@ -9,16 +9,9 @@ using namespace std;
 
 int strcmp(const char*, const char*);
 
-void AddCharacterInString(char * line, char symbol)
+void EntryLineInFile(FILE *f, const char * line, int count)
 {
-	int count = strlen(line);
-	line[count] = symbol;
-	line[count + 1] = '\0';
-}
-
-void EntryLineInFile(FILE *f, const char * line)
-{
-	for (int i(0); i < strlen(line); i++)
+	for (int i(0); i < count; i++)
 	{
 		fputc(line[i], f);
 	}
@@ -28,36 +21,31 @@ void ReplacementString(FILE * inFile, FILE * outFile, const char *searchString, 
 {
 	int ch;
 	int i = 0;
-	char *line = new char[strlen(searchString)];
-	line[0] = '\0';
 
 	while ((ch = fgetc(inFile)) != EOF)
 	{
 		if (ch == searchString[i])
 		{
-			AddCharacterInString(line, ch);
 			i++;
 			if (searchString[i] == '\0')
 			{
-				EntryLineInFile(outFile, replaceString);
-				line[0] = '\0';
+				EntryLineInFile(outFile, replaceString, strlen(replaceString));
 				i = 0;
 			}
 		}
 		else
 		{
-			if (line[0] != '\0')
+			if (i != 0)
 			{
-				EntryLineInFile(outFile, line);
-				line[0] = '\0';
+				EntryLineInFile(outFile, searchString, i);
 			}
 			i = 0;
 			fputc(ch, outFile);
 		}
 	}
-	if (line[0] != '\0')
+	if (i != 0)
 	{
-		EntryLineInFile(outFile, line);
+		EntryLineInFile(outFile, searchString, i);
 	}
 }
 
