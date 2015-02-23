@@ -126,7 +126,7 @@ void PrintMatrix(Matrix3x3 matrix)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			std::cout << matrix.body[i][j] << '\t';
+			printf("%.3f\t", matrix.body[i][j]);
 		}
 		std::cout << std::endl;
 	}
@@ -184,7 +184,13 @@ bool ReadMatrixFromFile(FILE *F, Matrix3x3 & matrix)
 
 int main(int argc, char* argv[])
 {
-	FILE *inFile = fopen("matrix.txt", "r");
+	if (argc != 2)
+	{
+		std::cout << "Wrong number of parameters!" << std::endl;
+		return 1;
+	}
+
+	FILE *inFile = fopen(argv[1], "r");
 	if (inFile == NULL)
 	{
 		printf("File opening error\n");
@@ -195,7 +201,7 @@ int main(int argc, char* argv[])
 	if (!ReadMatrixFromFile(inFile, matrix))
 	{
 		std::cout << "incorrect file" << std::endl;
-		return -1;
+		return 1;
 	}
 	fclose(inFile);
 
