@@ -178,7 +178,8 @@ bool ReadMatrixFromFile(FILE *F, Matrix3x3 & matrix)
 		{
 			line += ch;
 		}
-	}	return true;
+	}
+	return true;
 }
 
 int main(int argc, char* argv[])
@@ -188,7 +189,8 @@ int main(int argc, char* argv[])
 	{
 		printf("File opening error\n");
 		return 1;
-	}
+	}
+
 	Matrix3x3 matrix;
 	if (!ReadMatrixFromFile(inFile, matrix))
 	{

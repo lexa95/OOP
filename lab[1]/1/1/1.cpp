@@ -9,7 +9,7 @@ using namespace std;
 
 int strcmp(const char*, const char*);
 
-void EntryLineInFile(FILE *f, const char * line, int count)
+void WriteStringInFile(FILE *f, const char * line, int count)
 {
 	for (int i(0); i < count; i++)
 	{
@@ -29,7 +29,7 @@ void ReplacementString(FILE * inFile, FILE * outFile, const char *searchString, 
 			i++;
 			if (searchString[i] == '\0')
 			{
-				EntryLineInFile(outFile, replaceString, strlen(replaceString));
+				WriteStringInFile(outFile, replaceString, strlen(replaceString));
 				i = 0;
 			}
 		}
@@ -37,7 +37,7 @@ void ReplacementString(FILE * inFile, FILE * outFile, const char *searchString, 
 		{
 			if (i != 0)
 			{
-				EntryLineInFile(outFile, searchString, i);
+				WriteStringInFile(outFile, searchString, i);
 			}
 			i = 0;
 			fputc(ch, outFile);
@@ -45,13 +45,12 @@ void ReplacementString(FILE * inFile, FILE * outFile, const char *searchString, 
 	}
 	if (i != 0)
 	{
-		EntryLineInFile(outFile, searchString, i);
+		WriteStringInFile(outFile, searchString, i);
 	}
 }
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
-
 	if (argc != 5)
 	{
 		cout << "Wrong number of parameters!" << endl;
