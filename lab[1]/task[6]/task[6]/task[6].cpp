@@ -5,16 +5,24 @@
 
 const int MAX_SIZE = 100;
 
-void PrintMap(map myMap)
+void PrintMap(std::vector<std::vector<unsigned>> map)
 {
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < map.size(); i++)
 	{
-		for (int j = 0; j < 40; j++)
+		for (int j = 0; j < map[i].size(); j++)
 		{
-			std::cout << myMap.coordinates[i][j];
+			switch (map[i][j])
+			{
+			case 1: std::cout << '#'; break;
+			case 3: std::cout << 'A'; break;
+			case -1: std::cout << 'B'; break;
+			case 2: std::cout << '-'; break;
+			default: std::cout << ' ';;
+			}
 		}
 		std::cout << std::endl;
 	}
+
 }
 
 void SearchBorder(FILE *pFile, unsigned & leftLimit, 
@@ -51,61 +59,215 @@ void SearchBorder(FILE *pFile, unsigned & leftLimit,
 	rewind(pFile);
 }
 
-std::vector<std::vector<int>> ReadFromFileMap(FILE *pFile, )
+std::vector<std::vector<unsigned>> ReadFromFileMap(FILE *pFile, bool & err)
 {
-	std::vector<std::vector<int>> map(10);
 	int ch;
 	unsigned i = 0;
 	unsigned j = 0;
+	
 	unsigned leftLimit,	rightLimit,	topLimit, lowerLimit;
 	SearchBorder(pFile, leftLimit, rightLimit, topLimit, lowerLimit);
+	
+	if ((rightLimit - leftLimit) > 100 || (lowerLimit - topLimit) > 100)
+	{
+		err = true;
+	}
+	else
+	{
+		err = false;
+	}
+
+	std::vector<std::vector<unsigned>> map;
+	std::vector<unsigned> line;
+	
+	bool flag = false;
 	while ((ch = fgetc(pFile)) != EOF)
 	{
 		if (ch != '\n')
 		{
-			if ((i >= leftLimit || i <= rightLimit) && (j >= topLimit || j <= lowerLimit))
+			if ((i >= leftLimit && i <= rightLimit) && (j >= topLimit && j <= lowerLimit))
 			{
+				flag = true;
 				switch (ch)
 				{
-				case '#': myMap.coordinates[j - topLimit][i - leftLimit] = 1; break;
-				case 'A': myMap.coordinates[j - topLimit][i - leftLimit] = 2; break;
-				case 'B': myMap.coordinates[j - topLimit][i - leftLimit] = 3; break;
-				case ' ': myMap.coordinates[j - topLimit][i - leftLimit] = 0; break;
+				case '#': line.push_back(1); break;
+				case 'A': line.push_back(3); break;
+				case 'B': line.push_back(-1); break;
+				case ' ': line.push_back(0); break;
 				default: break;
 				}
-				i++;
 			}
+			i++;
 		}
 		else
 		{
+			if (flag)
+			{
+				map.push_back(line);
+				line.clear();
+			}
+			flag = false;
 			i = 0;
 			j++;
 		}
 	}
-	return true;
+	return map;
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+bool CheckArrayBounds(std::vector<std::vector<unsigned>> map, int x, int y)
 {
+	return (x >= 0 && map.size() >= x) && (y >= 0 && map[x].size() >= y);
+}
+
+void AddIndexes(std::vector<std::vector<unsigned>> & map, int x, int y, unsigned index)
+{
+	if (CheckArrayBounds(map, x + 1, y) && (map[x + 1][y] > index) || map[x + 1][y] == 0)
+	{
+		map[x + 1][y] = index;
+	}
+	if (CheckArrayBounds(map, x - 1, y) && (map[x - 1][y] > index) || map[x - 1][y] == 0)
+	{
+		map[x - 1][y] = index;
+	}
+	if (CheckArrayBounds(map, x, y + 1) && (map[x][y + 1] > index) || map[x][y + 1] == 0)
+	{
+		map[x][y + 1] = index;
+	}
+	if (CheckArrayBounds(map, x, y - 1) && (map[x][y - 1]  > index) || map[x][y - 1] == 0)
+	{
+		map[x][y - 1] = index;
+	}
+}
+
+void TakeCoordinatesEnd(std::vector<std::vector<unsigned>> map, int & x, int & y)
+{
+	for (int i = 0; i < map.size(); i++)
+	{
+		for (int j = 0; j < map[i].size(); j++)
+		{
+			if (map[i][j] == -1)
+			{
+				x = i;
+				y = j;
+				return;
+			}
+		}
+	}
+}
+
+void LetWave(std::vector<std::vector<unsigned>> & map, unsigned index, int xEnd, int yEnd)
+{
+	bool flag = true;
+
+	while (map[xEnd][yEnd] == -1 && flag)
+	{
+		flag = false; 
+		for (int i = 0; i < map.size(); i++)
+		{
+			for (int j = 0; j < map[i].size(); j++)
+			{
+				if (map[i][j] == index)
+				{
+					AddIndexes(map, i, j, index + 1);
+					flag = true;
+				}
+			}
+		}
+		index++;
+	}
+}
+
+void GatherWay(std::vector<std::vector<unsigned>> & map, int xEnd, int yEnd)
+{
+	int index = map[xEnd][yEnd];
+	map[xEnd][yEnd] = -1;
+	bool flag = true;
+	
+	while (flag)
+	{
+		if (map[xEnd + 1][yEnd] == index - 1)
+		{
+			xEnd++;
+		}
+		else if (map[xEnd - 1][yEnd] == index - 1)
+		{
+			xEnd--;
+		}
+		else if (map[xEnd][yEnd + 1] == index - 1)
+		{
+			yEnd++;
+		}
+		else if (map[xEnd][yEnd - 1] == index - 1)
+		{
+			yEnd--;
+		}
+		else flag = false;
+
+		if (map[xEnd][yEnd] == 3) break;
+		map[xEnd][yEnd] = 2;
+		index--;
+	}
+}
+
+void WaveSearch(std::vector<std::vector<unsigned>> map)
+{
+	int xEnd, yEnd;
+	TakeCoordinatesEnd(map, xEnd, yEnd);
+	
+	LetWave(map, 3, xEnd, yEnd);
+	GatherWay(map, xEnd, yEnd);
+	PrintMap(map);
+}
+
+bool CheckMap(std::vector<std::vector<unsigned>> map)
+{
+	int pointStart = 0;
+	int pointEnd = 0;
+
+	for (int i = 0; i < map.size(); i++)
+	{
+		for (int j = 0; j < map[i].size(); j++)
+		{
+			if (map[i][j] == 3)
+			{
+				pointStart++;
+			}
+			if (map[i][j] ==-1)
+			{
+				pointEnd++;
+			}
+		}
+	}
+	return  (pointStart == 1) && (pointEnd == 1);
+}
+
+int main(int argc, char* argv[])
+{
+	bool err;
+
 	FILE *pFile = fopen("labyrinth-3.txt", "r");
 	if (pFile == NULL)
 	{
 		printf("File opening error\n");
 		return 1;
-	}
-
-	for (int i = 0; i < 100; i++)
-	{
-		for (int j = 0; j < 100; j++)
-		{
-			myMap.coordinates[i][j] = 0;
-		}
 	}
 
-	ReadFromFileMap(pFile, myMap);
+	std::vector<std::vector<unsigned>> map = ReadFromFileMap(pFile, err);
 	fclose(pFile);
 
-	PrintMap(myMap);
+	if (err)
+	{
+		std::cout << "Large size of the maze." << std::endl;
+		return 1;
+	}
+
+	if (!CheckMap)
+	{
+		std::cout << "Incorrect map." << std::endl;
+		return 1;
+	}
+
+	WaveSearch(map);
 
 	_getch();
 	return 0;
