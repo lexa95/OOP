@@ -17,13 +17,33 @@ void PrintMap(std::vector<std::vector<unsigned>> map)
 			case 3: std::cout << 'A'; break;
 			case -1: std::cout << 'B'; break;
 			case 2: std::cout << '-'; break;
-			default: std::cout << ' ';;
+			default: std::cout << ' ';
 			}
 		}
 		std::cout << std::endl;
 	}
 
 }
+
+void WriteMazeOfFile(FILE * f, std::vector<std::vector<unsigned>> map)
+{
+	for (int i = 0; i < map.size(); i++)
+	{
+		for (int j = 0; j < map[i].size(); j++)
+		{
+			switch (map[i][j])
+			{
+			case 1: putc('#', f); break;
+			case 3: putc('A', f); break;
+			case -1: putc('B', f); break;
+			case 2: putc('-', f); break;
+			default: putc(' ', f);
+			}
+		}
+		putc('\n', f);
+	}
+}
+
 
 void SearchBorder(FILE *pFile, unsigned & leftLimit, 
 	unsigned & rightLimit, unsigned & topLimit, unsigned & lowerLimit)
@@ -116,7 +136,7 @@ std::vector<std::vector<unsigned>> ReadFromFileMap(FILE *pFile, bool & err)
 
 bool CheckArrayBounds(std::vector<std::vector<unsigned>> map, int x, int y)
 {
-	return (x >= 0 && map.size() >= x) && (y >= 0 && map[x].size() >= y);
+	return (x >= 0 && map.size() >= x) && (y > 0 && map[x].size() > y);
 }
 
 void AddIndexes(std::vector<std::vector<unsigned>> & map, int x, int y, unsigned index)
@@ -185,19 +205,19 @@ void GatherWay(std::vector<std::vector<unsigned>> & map, int xEnd, int yEnd)
 	
 	while (flag)
 	{
-		if (map[xEnd + 1][yEnd] == index - 1)
-		{
+		if (CheckArrayBounds(map, xEnd + 1, yEnd) && map[xEnd + 1][yEnd] == index - 1)
+		{CheckArrayBounds(map, xEnd + 1, yEnd) &&
 			xEnd++;
 		}
-		else if (map[xEnd - 1][yEnd] == index - 1)
+		else if (CheckArrayBounds(map, xEnd - 1, yEnd) && map[xEnd - 1][yEnd] == index - 1)
 		{
 			xEnd--;
 		}
-		else if (map[xEnd][yEnd + 1] == index - 1)
+		else if (CheckArrayBounds(map, xEnd, yEnd + 1) && map[xEnd][yEnd + 1] == index - 1)
 		{
 			yEnd++;
 		}
-		else if (map[xEnd][yEnd - 1] == index - 1)
+		else if (CheckArrayBounds(map, xEnd, yEnd - 1) && map[xEnd][yEnd - 1] == index - 1)
 		{
 			yEnd--;
 		}
@@ -209,14 +229,14 @@ void GatherWay(std::vector<std::vector<unsigned>> & map, int xEnd, int yEnd)
 	}
 }
 
-void WaveSearch(std::vector<std::vector<unsigned>> map)
+void WaveSearch(std::vector<std::vector<unsigned>> & map)
 {
 	int xEnd, yEnd;
 	TakeCoordinatesEnd(map, xEnd, yEnd);
 	
 	LetWave(map, 3, xEnd, yEnd);
 	GatherWay(map, xEnd, yEnd);
-	PrintMap(map);
+
 }
 
 bool CheckMap(std::vector<std::vector<unsigned>> map)
@@ -243,15 +263,20 @@ bool CheckMap(std::vector<std::vector<unsigned>> map)
 
 int main(int argc, char* argv[])
 {
-	bool err;
+	if (argc != 3)
+	{
+		printf("Wrong number of parameters\n");
+		return 1;
+	}
 
-	FILE *pFile = fopen("labyrinth-3.txt", "r");
+	FILE *pFile = fopen(argv[1], "r");
 	if (pFile == NULL)
 	{
 		printf("File opening error\n");
 		return 1;
 	}
 
+	bool err;
 	std::vector<std::vector<unsigned>> map = ReadFromFileMap(pFile, err);
 	fclose(pFile);
 
@@ -268,6 +293,15 @@ int main(int argc, char* argv[])
 	}
 
 	WaveSearch(map);
+
+	FILE *outFile = fopen(argv[2], "w");
+	if (outFile == NULL)
+	{
+		printf("File opening error\n");
+		return 1;
+	}
+	WriteMazeOfFile(outFile, map);
+	fclose(outFile);
 
 	_getch();
 	return 0;
