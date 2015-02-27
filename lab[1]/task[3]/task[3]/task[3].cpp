@@ -20,7 +20,7 @@ double Determinant2x2(Matrix2x2 matrix)
 	return matrix.body[0][0] * matrix.body[1][1] - matrix.body[0][1] * matrix.body[1][0];
 }
 
-double Determinant3x3(Matrix3x3 matrix)
+double Determinant3x3(const Matrix3x3 matrix)
 {
 	double result = 0;
 	for (int i = 0; i < 3; i++)
@@ -45,17 +45,16 @@ double StringToDouble(const char * str, bool & err)
 	return param;
 }
 
-Matrix2x2 Minor(Matrix3x3 matrix, int x, int y)
+Matrix2x2 Minor(const Matrix3x3 matrix, int x, int y)
 {
 	Matrix2x2 result;
 	int indX = 0;
-	int indY = 0;
 
 	for (int i = 0; i < 3; i++)
 	{
 		if (i != x)
 		{
-			indY = 0;
+			int indY = 0;
 			for (int j = 0; j < 3; j++)
 			{
 				if (j != y)
@@ -79,7 +78,7 @@ Matrix3x3 Matrix3x3OfCofactors(Matrix3x3 matrix)
 	return matrix;
 }
 
-Matrix3x3 MatrixMinors(Matrix3x3 matrix)
+Matrix3x3 MatrixMinors(const Matrix3x3 matrix)
 {
 	Matrix3x3 result;
 	for (int i = 0; i < 3; i++)
@@ -93,7 +92,7 @@ Matrix3x3 MatrixMinors(Matrix3x3 matrix)
 	return result;
 }
 
-Matrix3x3 TransposeMatrix(Matrix3x3 matrix)
+Matrix3x3 TransposeMatrix(const Matrix3x3 matrix)
 {
 	Matrix3x3 result;
 	for (int i = 0; i < 3; i++)
@@ -107,7 +106,7 @@ Matrix3x3 TransposeMatrix(Matrix3x3 matrix)
 	return result;
 }
 
-Matrix3x3 MultiplicationMatrixByNumber(Matrix3x3 matrix, double number)
+Matrix3x3 MultiplicationMatrixByNumber(const Matrix3x3 matrix, double number)
 {
 	Matrix3x3 result;
 	for (int i = 0; i < 3; i++)
@@ -120,7 +119,7 @@ Matrix3x3 MultiplicationMatrixByNumber(Matrix3x3 matrix, double number)
 	return result;
 }
 
-void PrintMatrix(Matrix3x3 matrix)
+void PrintMatrix(const Matrix3x3 matrix)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -132,7 +131,7 @@ void PrintMatrix(Matrix3x3 matrix)
 	}
 }
 
-Matrix3x3 InverseMatrix(Matrix3x3 matrix)
+Matrix3x3 InverseMatrix(const Matrix3x3 matrix)
 {
 	Matrix3x3 result;
 	double determinant = Determinant3x3(matrix);
@@ -144,20 +143,28 @@ Matrix3x3 InverseMatrix(Matrix3x3 matrix)
 	return result;
 }
 
-bool ReadMatrixFromFile(FILE *F, Matrix3x3 & matrix)
+bool ReadMatrixFromFile(const char * fileName, Matrix3x3 & matrix)
 {
+	FILE *inFile = fopen(fileName, "r");
+	if (inFile == NULL)
+	{
+		printf("File opening error\n");
+		return false;
+	}
+
 	int ch;
 	int i = 0;
 	int j = 0;
 	std::string line = "";
 	bool err;
-	while ((ch = fgetc(F)) != EOF)
+	while ((ch = fgetc(inFile)) != EOF)
 	{
 		if (ch == '\t')
 		{
 			matrix.body[i][j] = StringToDouble(line.c_str(), err);
 			if (err)
 			{
+				fclose(inFile);
 				return false;
 			}
 			line = "";
@@ -168,6 +175,7 @@ bool ReadMatrixFromFile(FILE *F, Matrix3x3 & matrix)
 			matrix.body[i][j] = StringToDouble(line.c_str(), err);
 			if (err)
 			{
+				fclose(inFile);
 				return false;
 			}
 			line = "";
@@ -179,6 +187,7 @@ bool ReadMatrixFromFile(FILE *F, Matrix3x3 & matrix)
 			line += ch;
 		}
 	}
+	fclose(inFile);
 	return true;
 }
 
@@ -190,20 +199,12 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	FILE *inFile = fopen(argv[1], "r");
-	if (inFile == NULL)
-	{
-		printf("File opening error\n");
-		return 1;
-	}
-
 	Matrix3x3 matrix;
-	if (!ReadMatrixFromFile(inFile, matrix))
+	if (!ReadMatrixFromFile(argv[1], matrix))
 	{
 		std::cout << "incorrect file" << std::endl;
 		return 1;
 	}
-	fclose(inFile);
 
 	InverseMatrix(matrix);
 
