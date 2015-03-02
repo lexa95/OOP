@@ -131,10 +131,14 @@ void PrintMatrix(const Matrix3x3 matrix)
 	}
 }
 
-Matrix3x3 InverseMatrix(const Matrix3x3 matrix)
+Matrix3x3 InverseMatrix(const Matrix3x3 matrix, bool & err)
 {
 	Matrix3x3 result;
 	double determinant = Determinant3x3(matrix);
+	if (determinant == 0)
+	{
+		return result;
+	}
 	result = MatrixMinors(matrix);
 	result = Matrix3x3OfCofactors(result);
 	result = TransposeMatrix(result);
@@ -206,9 +210,15 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	InverseMatrix(matrix);
 
-	_getch();
+	bool err;
+	InverseMatrix(matrix, err);
+	if (err)
+	{
+		std::cout << "Impossible to invert a matrix" << std::endl;
+		return 1;
+	}
+
 	return 0;
 }
 
