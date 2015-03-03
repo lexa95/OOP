@@ -9,6 +9,7 @@ using namespace std;
 int strcmp(const char *str1, const char *str2);
 
 
+
 double StringToDouble(const char * str, bool & err)
 {
 	char * pLastChar = NULL;

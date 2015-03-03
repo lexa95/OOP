@@ -83,32 +83,6 @@ bool WriteFromFileInFile(const char * nameInputFile, const char * nameOutputFile
 
 int main(int argc, const char * argv[])
 {
-	/*int result = 0;
-	int backResult = 0;
-	int num = 254;
-
-	result |= (num & 1) << 2;
-	result |= (num & 2) << 2;
-	result |= (num & 4) << 2;
-	result |= (num & 8) << 3;
-	result |= (num & 16) << 3;
-	result |= (num & 32) >> 5;
-	result |= (num & 64) >> 5;
-	result |= (num & 128) >> 2;
-	std::cout << int(result) << std::endl;
-
-	backResult |= (result & 1) << 5;
-	backResult |= (result & 2) << 5;
-	backResult |= (result & 4) >> 2;
-	backResult |= (result & 8) >> 2;
-	backResult |= (result & 16) >> 2;
-	backResult |= (result & 32) << 2;
-	backResult |= (result & 64) >> 3;
-	backResult |= (result & 128) >> 3;
-	std::cout << int(backResult) << std::endl;
-
-	_getch();*/
-
 	setlocale(LC_ALL, "Rus");
 	if (argc != 5)
 	{
