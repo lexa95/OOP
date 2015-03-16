@@ -8,20 +8,20 @@
 
 using namespace std;
 
-void WriteStringInFile(FILE *f, const char * line, int count)
+void WriteStringInFile(FILE *f, const char * line, size_t count)
 {
-	for (int i(0); i < count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
 		fputc(line[i], f);
 		cout << line[i];
 	}
 }
 
-int CheckForOccurrence(const char *searchString, int count)
+size_t CheckForOccurrence(const char *searchString, size_t count)
 {
-	for (int i = 1; i < count; i++)
+	for (size_t i = 1; i < count; i++)
 	{
-		for (int j = i; j <= count; j++)
+		for (size_t j = i; j <= count; j++)
 		{
 			if (j == count) return j - i;
 			if (!(searchString[j] == searchString[j - i]))
@@ -33,13 +33,13 @@ int CheckForOccurrence(const char *searchString, int count)
 	return 0;
 }
 
-vector<int> Kmp(const char *line)
+vector<size_t> Kmp(const char *line)
 {
-	vector<int> kmpArray;
-	for (int i = 0; i < strlen(line); i++)
+	vector<size_t> kmpArray;
+	size_t count = strlen(line);
+	for (size_t i = 0; i < count; ++i)
 	{
 		kmpArray.push_back(CheckForOccurrence(line, i + 1));
-		cout << i << '-' <<line[i] << '-' << CheckForOccurrence(line, i + 1) << endl;
 	}
 	return kmpArray;
 }
@@ -47,8 +47,8 @@ vector<int> Kmp(const char *line)
 void ReplacementString(FILE * inFile, FILE * outFile, const char *searchString, const char *replaceString)
 {
 	int ch;
-	int i = 0;
-	vector<int> kmpArray = Kmp(searchString);
+	size_t i = 0;
+	auto kmpArray = Kmp(searchString);
 
 	while ((ch = fgetc(inFile)) != EOF)
 	{
@@ -66,7 +66,7 @@ void ReplacementString(FILE * inFile, FILE * outFile, const char *searchString, 
 
 			if (i != 0)
 			{
-				int count = i;
+				size_t count = i;
 				i = kmpArray[i-1];
 				WriteStringInFile(outFile, searchString, count - i);
 				i++;

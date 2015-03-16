@@ -16,7 +16,6 @@ std::vector<double>AddNumber()
 {
 	std::vector<double> result;
 	std::string num;
-	double value;
 	do
 	{
 		std::cout << "Enter number: ";
@@ -27,7 +26,7 @@ std::vector<double>AddNumber()
 		}
 
 		bool err;
-		int value = StringToDouble(num.c_str(), err);
+		double value = StringToDouble(num.c_str(), err);
 		if (err)
 		{
 			std::cout << "Incorrect number.";

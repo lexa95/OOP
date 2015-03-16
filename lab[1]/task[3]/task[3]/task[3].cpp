@@ -13,14 +13,14 @@ struct Matrix2x2
 	double body[2][2];
 };
 
-Matrix2x2 Minor(Matrix3x3, int, int);
+Matrix2x2 Minor(const Matrix3x3 & matrix, int x, int y);
 
-double Determinant2x2(Matrix2x2 matrix)
+double Determinant2x2(const Matrix2x2 & matrix)
 {
 	return matrix.body[0][0] * matrix.body[1][1] - matrix.body[0][1] * matrix.body[1][0];
 }
 
-double Determinant3x3(const Matrix3x3 matrix)
+double Determinant3x3(const Matrix3x3 & matrix)
 {
 	double result = 0;
 	for (int i = 0; i < 3; i++)
@@ -45,7 +45,7 @@ double StringToDouble(const char * str, bool & err)
 	return param;
 }
 
-Matrix2x2 Minor(const Matrix3x3 matrix, int x, int y)
+Matrix2x2 Minor(const Matrix3x3 & matrix, int x, int y)
 {
 	Matrix2x2 result;
 	int indX = 0;
@@ -78,7 +78,7 @@ Matrix3x3 Matrix3x3OfCofactors(Matrix3x3 matrix)
 	return matrix;
 }
 
-Matrix3x3 MatrixMinors(const Matrix3x3 matrix)
+Matrix3x3 MatrixMinors(const Matrix3x3 & matrix)
 {
 	Matrix3x3 result;
 	for (int i = 0; i < 3; i++)
@@ -92,7 +92,7 @@ Matrix3x3 MatrixMinors(const Matrix3x3 matrix)
 	return result;
 }
 
-Matrix3x3 TransposeMatrix(const Matrix3x3 matrix)
+Matrix3x3 TransposeMatrix(const Matrix3x3 & matrix)
 {
 	Matrix3x3 result;
 	for (int i = 0; i < 3; i++)
@@ -106,7 +106,7 @@ Matrix3x3 TransposeMatrix(const Matrix3x3 matrix)
 	return result;
 }
 
-Matrix3x3 MultiplicationMatrixByNumber(const Matrix3x3 matrix, double number)
+Matrix3x3 MultiplicationMatrixByNumber(const Matrix3x3 & matrix, double number)
 {
 	Matrix3x3 result;
 	for (int i = 0; i < 3; i++)
@@ -119,7 +119,7 @@ Matrix3x3 MultiplicationMatrixByNumber(const Matrix3x3 matrix, double number)
 	return result;
 }
 
-void PrintMatrix(const Matrix3x3 matrix)
+void PrintMatrix(const Matrix3x3 & matrix)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -131,12 +131,13 @@ void PrintMatrix(const Matrix3x3 matrix)
 	}
 }
 
-Matrix3x3 InverseMatrix(const Matrix3x3 matrix, bool & err)
+Matrix3x3 InverseMatrix(const Matrix3x3 & matrix, bool & err)
 {
-	Matrix3x3 result;
+	Matrix3x3 result = { 0 };
 	double determinant = Determinant3x3(matrix);
 	if (determinant == 0)
 	{
+		err = true;;
 		return result;
 	}
 	result = MatrixMinors(matrix);
@@ -144,13 +145,16 @@ Matrix3x3 InverseMatrix(const Matrix3x3 matrix, bool & err)
 	result = TransposeMatrix(result);
 	result = MultiplicationMatrixByNumber(result, 1 / determinant);
 	PrintMatrix(result);
+
+	err = false;
 	return result;
 }
 
 bool ReadMatrixFromFile(const char * fileName, Matrix3x3 & matrix)
 {
-	FILE *inFile = fopen(fileName, "r");
-	if (inFile == NULL)
+	FILE *inFile = nullptr;
+	
+	if (fopen_s(&inFile, fileName, "r") != 0)
 	{
 		printf("File opening error\n");
 		return false;
@@ -161,7 +165,8 @@ bool ReadMatrixFromFile(const char * fileName, Matrix3x3 & matrix)
 	int j = 0;
 	std::string line = "";
 	bool err;
-	while ((ch = fgetc(inFile)) != EOF)
+	ch = fgetc(inFile);
+	do
 	{
 		if (ch == '\t')
 		{
@@ -190,10 +195,15 @@ bool ReadMatrixFromFile(const char * fileName, Matrix3x3 & matrix)
 		{
 			line += ch;
 		}
+	} while ((ch = fgetc(inFile)) != EOF);
+	if (i == 2 && j == 2)
+	{
+		matrix.body[i][j] = StringToDouble(line.c_str(), err);
 	}
 	fclose(inFile);
 	return true;
 }
+
 
 int main(int argc, char* argv[])
 {
@@ -219,6 +229,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	_getch();
 	return 0;
 }
 
