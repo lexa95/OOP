@@ -10,8 +10,10 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <vector>
+#include <string>
 #include <iostream>
-#include <set>
+#include <map>
 #include <vector>
 
 // TODO: reference additional headers your program requires here

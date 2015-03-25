@@ -128,7 +128,6 @@ bool InteractionWithTheUser(std::map<std::string, std::string> & dictionary, con
 {
 	std::cout << "Enter word: " << std::endl;
 	bool isChangeDictionary = false;
-	out:
 	while (!std::cin.eof())
 	{
 		std::string line;
@@ -137,7 +136,7 @@ bool InteractionWithTheUser(std::map<std::string, std::string> & dictionary, con
 		{
 			if (line == "")
 			{
-				goto out;
+				continue;
 			}
 
 			auto search = SearchForKeyInTheArray(dictionary, line);
@@ -158,7 +157,8 @@ bool InteractionWithTheUser(std::map<std::string, std::string> & dictionary, con
 				}
 				else
 				{
-					std::cout << "—лово У" << line << "Ф проигнорировано." << std::endl;				}
+					std::cout << "—лово У" << line << "Ф проигнорировано." << std::endl;
+				}
 			}
 		}
 		else

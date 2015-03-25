@@ -17,7 +17,7 @@ void PrintSet(std::set<int> & setNumbers)
 	std::set<int>::iterator it;
 	for (it = setNumbers.begin(); it != setNumbers.end(); ++it)
 	{
-		std::cout << *it << ' ';
+		std::cout << *it << std::endl;
 	}
 }
 
@@ -35,18 +35,17 @@ int main(int argc, char* argv[])
 	int upperBound = StringToInt(argv[1], err);
 	if (err)
 	{
-		std::cout << "Не ерный параметр." << std::endl;
+		std::cout << "Не верный параметр." << std::endl;
 		return 1;
 	}
 	
-	if (upperBound <= 1 || upperBound >= 100000)
+	if (upperBound <= 1 || upperBound > 100000000)
 	{
-		std::cout << "Число должно быть меньше 100 000 и больше 1." << std::endl;
+		std::cout << "Число должно быть меньше 100 000 000 и больше 1." << std::endl;
 		return 1;
 	}
-
+	
 	PrintSet(GeneratePrimeNumbersSet(upperBound));
-
 	system("PAUSE");
 	return 0;
 }

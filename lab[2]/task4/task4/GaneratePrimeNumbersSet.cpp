@@ -1,28 +1,36 @@
 #include "stdafx.h"
 #include "GaneratePrimeNumbersSet.h"
 
-void DeleteMultiplesOfTheNumber(std::set<int> & setNumbers, int upperBound, int number)
+void DeleteMultiplesOfTheNumber(std::vector<bool> & isSkip, const int upperBound, const int number)
 {
-	for (int i = number * 2; i <= upperBound; i += number)
+	if (long long int(number) * number < INT_MAX)
 	{
-		setNumbers.erase(i);
+		for (int i = (number * number); i <= upperBound; i += number)
+		{
+			isSkip[i] = false;
+		}
 	}
 }
 
 std::set<int> GeneratePrimeNumbersSet(int upperBound)
 {
 	std::set<int> result;
-	std::set<int>::iterator it;
+	std::vector<bool> isSkip;
+	std::vector<int> allNumbers;
 
-	for (int i = 2; i <= upperBound; i++)
+	for (int i = 1; i <= upperBound + 1; i++)
 	{
-		result.insert(i);
+		allNumbers.push_back(i);
+		isSkip.push_back(true);
 	}
 
-	for (it = result.begin(); it != result.end(); ++it)
+	for (int i = 2; i <= upperBound + 1; i++)
 	{
-		DeleteMultiplesOfTheNumber(result, upperBound, *it);
+		if (isSkip[i])
+		{
+			result.insert(i);
+			DeleteMultiplesOfTheNumber(isSkip, upperBound, i);
+		}
 	}
-
 	return result;
 }
