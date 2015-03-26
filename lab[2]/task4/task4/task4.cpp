@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "GaneratePrimeNumbersSet.h"
+#include <ctime>
 
 int StringToInt(const char * str, bool & err)
 {
@@ -44,8 +45,16 @@ int main(int argc, char* argv[])
 		std::cout << "Число должно быть меньше 100 000 000 и больше 1." << std::endl;
 		return 1;
 	}
+
+	std::set<int> datebase;
+	unsigned int start_time = clock();
+	datebase = GeneratePrimeNumbersSet(upperBound);
+	unsigned int end_time = clock();
+	std::cout << end_time - start_time << std::endl;
+	system("PAUSE");
+	PrintSet(datebase);
 	
-	PrintSet(GeneratePrimeNumbersSet(upperBound));
+	
 	system("PAUSE");
 	return 0;
 }
