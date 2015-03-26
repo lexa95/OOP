@@ -1,3 +1,5 @@
 #pragma once
 
-std::string ExpandTemplate(std::string const& tpl, std::map<std::string, std::string> const& params);
+using namespace std;
+
+string ExpandTemplate(string tpl, map<string, string> params);
