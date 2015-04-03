@@ -17,21 +17,17 @@ std::set<int> GeneratePrimeNumbersSet(int upperBound)
 {
 	std::set<int> result;
 	std::vector<bool> isSkip;
-	std::vector<int> allNumbers;
+	isSkip.reserve(upperBound);
 
 	if (upperBound < 2)
 	{
 		return result;
 	}
 
-	allNumbers.push_back(2);
 	isSkip.push_back(true);
 	for (int i = 3; i <= upperBound; i += 2)
 	{
-		allNumbers.push_back(i);
 		isSkip.push_back(true);
-
-		allNumbers.push_back(i + 1);
 		isSkip.push_back(false);
 	}
 

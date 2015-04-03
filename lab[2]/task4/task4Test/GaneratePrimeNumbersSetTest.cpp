@@ -34,13 +34,9 @@ BOOST_AUTO_TEST_CASE(ChackResult2)
 	BOOST_CHECK(result == GeneratePrimeNumbersSet(10));
 }
 
-BOOST_AUTO_TEST_CASE(ChackResult3)
-{
-	std::set<int> result;
-	BOOST_CHECK(result == GeneratePrimeNumbersSet(1));
-}
-
 BOOST_AUTO_TEST_CASE(ChackEmplySet)
 {
 	BOOST_CHECK(GeneratePrimeNumbersSet(1).empty());
+	BOOST_CHECK(GeneratePrimeNumbersSet(-1).empty());
+	BOOST_CHECK(GeneratePrimeNumbersSet(0).empty());
 }

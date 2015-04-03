@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
 	unsigned int start_time = clock();
 	datebase = GeneratePrimeNumbersSet(upperBound);
 	unsigned int end_time = clock();
-	std::cout << end_time - start_time << std::endl;
-	system("PAUSE");
+	//std::cout << end_time - start_time << std::endl;
+	//system("PAUSE");
 	PrintSet(datebase);
 	
 	
