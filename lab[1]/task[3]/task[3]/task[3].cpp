@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include <iostream>
 #include <conio.h>
+#include <stdio.h>
+#include <windows.h>
+#include <iomanip>
+
 #define _CRT_SECURE_NO_WARNINGS
 
 struct Matrix3x3
@@ -121,11 +125,12 @@ Matrix3x3 MultiplicationMatrixByNumber(const Matrix3x3 & matrix, double number)
 
 void PrintMatrix(const Matrix3x3 & matrix)
 {
+	std::cout << std::fixed << std::setprecision(3);
 	for (int i = 0; i < 3; i++)
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			printf("%.3f\t", matrix.body[i][j]);
+			std::cout << matrix.body[i][j] << '\t';
 		}
 		std::cout << std::endl;
 	}
@@ -137,7 +142,7 @@ Matrix3x3 InverseMatrix(const Matrix3x3 & matrix, bool & err)
 	double determinant = Determinant3x3(matrix);
 	if (determinant == 0)
 	{
-		err = true;;
+		err = true;
 		return result;
 	}
 	result = MatrixMinors(matrix);
@@ -160,12 +165,11 @@ bool ReadMatrixFromFile(const char * fileName, Matrix3x3 & matrix)
 		return false;
 	}
 
-	int ch;
 	int i = 0;
 	int j = 0;
 	std::string line = "";
 	bool err;
-	ch = fgetc(inFile);
+	int ch = fgetc(inFile);
 	do
 	{
 		if (ch == '\t')
@@ -196,14 +200,19 @@ bool ReadMatrixFromFile(const char * fileName, Matrix3x3 & matrix)
 			line += ch;
 		}
 	} while ((ch = fgetc(inFile)) != EOF);
+	
 	if (i == 2 && j == 2)
 	{
 		matrix.body[i][j] = StringToDouble(line.c_str(), err);
 	}
+	else if (!(i == 3 && j == 0))
+	{
+		return false;
+	}
+	
 	fclose(inFile);
 	return true;
 }
-
 
 int main(int argc, char* argv[])
 {
@@ -219,7 +228,6 @@ int main(int argc, char* argv[])
 		std::cout << "incorrect file" << std::endl;
 		return 1;
 	}
-
 
 	bool err;
 	InverseMatrix(matrix, err);
