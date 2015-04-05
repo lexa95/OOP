@@ -42,32 +42,23 @@ int BackStirBits(int bit)
 	return result;
 }
 
-void Ñrypt(int ch, int key, FILE * f)
-{
-	fputc(StirBits(ch ^ key), f);
-}
-
-void Decrypt(int ch, int key, FILE * f)
-{
-
-	fputc(BackStirBits(ch) ^ key, f);
-}
-
-bool WriteFromFileInFile(const char * nameInputFile, const char * nameOutputFile,
+bool WriteFromFileInFile(const std::string nameInputFile, const std::string nameOutputFile,
 	const int key, void(*Process)(int ch, int key, FILE * f))
 {
-	FILE *pInputFile = fopen(nameInputFile, "rb");
-	if (pInputFile == NULL)
+	
+	FILE *pInputFile;
+	if (fopen_s(&pInputFile, nameInputFile.c_str(), "rb") != 0)
 	{
 		printf("File opening error\n");
-		return true;
+		return false;
 	}
 
-	FILE *pOutputFile = fopen(nameOutputFile, "wb");
-	if (pOutputFile == NULL)
+	FILE *pOutputFile;
+	if (fopen_s(&pOutputFile, nameOutputFile.c_str(), "wb") != 0)
 	{
 		printf("File opening error\n");
-		return true;
+		fclose(pInputFile);
+		return false;
 	}
 	
 	int ch;
@@ -78,7 +69,7 @@ bool WriteFromFileInFile(const char * nameInputFile, const char * nameOutputFile
 
 	fclose(pInputFile);
 	fclose(pOutputFile);
-	return false;
+	return true;
 }
 
 int main(int argc, const char * argv[])
@@ -100,14 +91,28 @@ int main(int argc, const char * argv[])
 
 	if (!strcmp(argv[1], "crypt"))
 	{
-		if (WriteFromFileInFile(argv[2], argv[3], key, Ñrypt))
+		std::function<bool()> f = []() -> bool {
+			return false;
+		};
+
+		auto Ñrypt = [](int ch, int key, FILE * f) -> void
+		{
+			fputc(StirBits(ch ^ key), f);
+		};
+
+		if (!WriteFromFileInFile(argv[2], argv[3], key, Ñrypt))
 		{
 			return 1;
 		}
 	}
 	else if (!strcmp(argv[1], "decrypt"))
 	{
-		if (WriteFromFileInFile(argv[2], argv[3], key, Decrypt))
+		auto Decrypt = [](int ch, int key, FILE * f) -> void
+		{
+			fputc(BackStirBits(ch) ^ key, f);
+		};
+
+		if (!WriteFromFileInFile(argv[2], argv[3], key, Decrypt))
 		{
 			return 1;
 		}
