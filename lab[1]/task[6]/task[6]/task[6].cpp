@@ -5,6 +5,11 @@
 
 const int MAX_SIZE = 100;
 
+const int start = 3;
+const int end = -1;
+const int obstacle = 1;
+const int way = 2;
+
 void PrintMap(std::vector<std::vector<unsigned>> map)
 {
 	for (int i = 0; i < map.size(); i++)
@@ -13,10 +18,10 @@ void PrintMap(std::vector<std::vector<unsigned>> map)
 		{
 			switch (map[i][j])
 			{
-			case 1: std::cout << '#'; break;
-			case 3: std::cout << 'A'; break;
-			case -1: std::cout << 'B'; break;
-			case 2: std::cout << '-'; break;
+			case obstacle : std::cout << '#'; break;
+			case start    : std::cout << 'A'; break;
+			case end      : std::cout << 'B'; break;
+			case way      : std::cout << '-'; break;
 			default: std::cout << ' ';
 			}
 		}
@@ -33,17 +38,16 @@ void WriteMazeOfFile(FILE * f, std::vector<std::vector<unsigned>> map)
 		{
 			switch (map[i][j])
 			{
-			case 1: putc('#', f); break;
-			case 3: putc('A', f); break;
-			case -1: putc('B', f); break;
-			case 2: putc('-', f); break;
+			case obstacle : putc('#', f); break;
+			case start    : putc('A', f); break;
+			case end      : putc('B', f); break;
+			case way      : putc('-', f); break;
 			default: putc(' ', f);
 			}
 		}
 		putc('\n', f);
 	}
 }
-
 
 void SearchBorder(FILE *pFile, unsigned & leftLimit, 
 	unsigned & rightLimit, unsigned & topLimit, unsigned & lowerLimit)
@@ -179,7 +183,7 @@ void LetWave(std::vector<std::vector<unsigned>> & map, unsigned index, int xEnd,
 {
 	bool flag = true;
 
-	while (map[xEnd][yEnd] == -1 && flag)
+	while (map[xEnd][yEnd] == end && flag)
 	{
 		flag = false; 
 		for (int i = 0; i < map.size(); i++)
@@ -200,7 +204,7 @@ void LetWave(std::vector<std::vector<unsigned>> & map, unsigned index, int xEnd,
 void GatherWay(std::vector<std::vector<unsigned>> & map, int xEnd, int yEnd)
 {
 	int index = map[xEnd][yEnd];
-	map[xEnd][yEnd] = -1;
+	map[xEnd][yEnd] = end;
 	bool flag = true;
 	
 	while (flag)
@@ -223,8 +227,8 @@ void GatherWay(std::vector<std::vector<unsigned>> & map, int xEnd, int yEnd)
 		}
 		else flag = false;
 
-		if (map[xEnd][yEnd] == 3) break;
-		map[xEnd][yEnd] = 2;
+		if (map[xEnd][yEnd] == start) break;
+		map[xEnd][yEnd] = way;
 		index--;
 	}
 }
@@ -234,7 +238,7 @@ void WaveSearch(std::vector<std::vector<unsigned>> & map)
 	int xEnd, yEnd;
 	TakeCoordinatesEnd(map, xEnd, yEnd);
 	
-	LetWave(map, 3, xEnd, yEnd);
+	LetWave(map, start, xEnd, yEnd);
 	GatherWay(map, xEnd, yEnd);
 
 }
@@ -248,11 +252,11 @@ bool CheckMap(std::vector<std::vector<unsigned>> map)
 	{
 		for (int j = 0; j < map[i].size(); j++)
 		{
-			if (map[i][j] == 3)
+			if (map[i][j] == start)
 			{
 				pointStart++;
 			}
-			if (map[i][j] ==-1)
+			if (map[i][j] == end)
 			{
 				pointEnd++;
 			}
@@ -269,8 +273,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	FILE *pFile = fopen(argv[1], "r");
-	if (pFile == NULL)
+	FILE *pFile;
+	if (fopen_s(&pFile, argv[1], "r") != 0)
 	{
 		printf("File opening error\n");
 		return 1;
@@ -286,7 +290,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	if (!CheckMap)
+	if (!CheckMap(map))
 	{
 		std::cout << "Incorrect map." << std::endl;
 		return 1;
@@ -303,7 +307,6 @@ int main(int argc, char* argv[])
 	WriteMazeOfFile(outFile, map);
 	fclose(outFile);
 
-	_getch();
 	return 0;
 }
 
