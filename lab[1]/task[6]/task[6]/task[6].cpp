@@ -10,13 +10,20 @@ const int end = -1;
 const int obstacle = 1;
 const int way = 2;
 
-void PrintMap(std::vector<std::vector<unsigned>> map)
+struct Map
 {
-	for (int i = 0; i < map.size(); i++)
+	int width;
+	int height;
+	std::vector<unsigned> body;
+};
+
+void PrintMap(Map map)
+{
+	for (int i = 0; i < map.height; i++)
 	{
-		for (int j = 0; j < map[i].size(); j++)
+		for (int j = 0; j < map.width; j++)
 		{
-			switch (map[i][j])
+			switch (map.body[i * map.width + j])
 			{
 			case obstacle : std::cout << '#'; break;
 			case start    : std::cout << 'A'; break;
@@ -30,13 +37,13 @@ void PrintMap(std::vector<std::vector<unsigned>> map)
 
 }
 
-void WriteMazeOfFile(FILE * f, std::vector<std::vector<unsigned>> map)
+void WriteMazeOfFile(FILE * f, Map map)
 {
-	for (int i = 0; i < map.size(); i++)
+	for (int i = 0; i < map.height; i++)
 	{
-		for (int j = 0; j < map[i].size(); j++)
+		for (int j = 0; j < map.width; j++)
 		{
-			switch (map[i][j])
+			switch (map.body[i * map.width + j])
 			{
 			case obstacle : putc('#', f); break;
 			case start    : putc('A', f); break;
@@ -83,7 +90,7 @@ void SearchBorder(FILE *pFile, unsigned & leftLimit,
 	rewind(pFile);
 }
 
-std::vector<std::vector<unsigned>> ReadFromFileMap(FILE *pFile, bool & err)
+Map ReadFromFileMap(FILE *pFile, bool & err)
 {
 	int ch;
 	unsigned i = 0;
@@ -101,8 +108,13 @@ std::vector<std::vector<unsigned>> ReadFromFileMap(FILE *pFile, bool & err)
 		err = false;
 	}
 
-	std::vector<std::vector<unsigned>> map;
-	std::vector<unsigned> line;
+	Map result;
+	result.width = rightLimit - leftLimit + 1;
+	result.height = lowerLimit - topLimit + 1; 
+	result.body.reserve(result.height * result.width);
+	
+	size_t length = result.height * result.width;
+	for (size_t index = 0; index <= length; index++) result.body.push_back(0);
 	
 	bool flag = false;
 	while ((ch = fgetc(pFile)) != EOF)
@@ -111,155 +123,144 @@ std::vector<std::vector<unsigned>> ReadFromFileMap(FILE *pFile, bool & err)
 		{
 			if ((i >= leftLimit && i <= rightLimit) && (j >= topLimit && j <= lowerLimit))
 			{
+				int coordinate = (j - topLimit) * result.width + (i - leftLimit);
 				flag = true;
 				switch (ch)
 				{
-				case '#': line.push_back(1); break;
-				case 'A': line.push_back(3); break;
-				case 'B': line.push_back(-1); break;
-				case ' ': line.push_back(0); break;
+				case '#': result.body[coordinate] = obstacle; break;
+				case 'A': result.body[coordinate] = start; break;
+				case 'B': result.body[coordinate] = end; break;
 				default: break;
 				}
+				//std::cout << char(ch);
 			}
 			i++;
 		}
 		else
 		{
-			if (flag)
-			{
-				map.push_back(line);
-				line.clear();
-			}
+			//std::cout << std::endl;
 			flag = false;
 			i = 0;
 			j++;
 		}
 	}
-	return map;
+	return result;
 }
 
-bool CheckArrayBounds(std::vector<std::vector<unsigned>> map, int x, int y)
+bool CheckArrayBounds(Map map, int coordinates)
 {
-	return (x >= 0 && map.size() >= x) && (y > 0 && map[x].size() > y);
+	return (0 <= coordinates) && coordinates <= (map.height * map.width) &&
+		(coordinates + 1) % map.width != 0 && (coordinates + 1) % map.width + 1 != 0;
+} 
+
+void AddIndexes(Map & map, int coordinates, unsigned index)
+{
+	if (CheckArrayBounds(map, coordinates + 1) && (map.body[coordinates + 1] > index) || map.body[coordinates + 1] == 0)
+	{
+		map.body[coordinates + 1] = index;
+	}
+	if (CheckArrayBounds(map, coordinates - 1) && (map.body[coordinates - 1] > index) || map.body[coordinates - 1] == 0)
+	{
+		map.body[coordinates - 1] = index;
+	}
+	if (CheckArrayBounds(map, coordinates + map.width) && (map.body[coordinates + map.width] > index) || map.body[coordinates + map.width] == 0)
+	{
+		map.body[coordinates + map.width] = index;
+	}
+	if (CheckArrayBounds(map, coordinates - map.width) && (map.body[coordinates - map.width] > index) || map.body[coordinates - map.width] == 0)
+	{
+		map.body[coordinates - map.width] = index;
+	}
 }
 
-void AddIndexes(std::vector<std::vector<unsigned>> & map, int x, int y, unsigned index)
+int TakeCoordinatesEnd(Map const & map)
 {
-	if (CheckArrayBounds(map, x + 1, y) && (map[x + 1][y] > index) || map[x + 1][y] == 0)
+	for (int i = 0; i < map.width * map.height; i++)
 	{
-		map[x + 1][y] = index;
-	}
-	if (CheckArrayBounds(map, x - 1, y) && (map[x - 1][y] > index) || map[x - 1][y] == 0)
-	{
-		map[x - 1][y] = index;
-	}
-	if (CheckArrayBounds(map, x, y + 1) && (map[x][y + 1] > index) || map[x][y + 1] == 0)
-	{
-		map[x][y + 1] = index;
-	}
-	if (CheckArrayBounds(map, x, y - 1) && (map[x][y - 1]  > index) || map[x][y - 1] == 0)
-	{
-		map[x][y - 1] = index;
-	}
-}
-
-void TakeCoordinatesEnd(std::vector<std::vector<unsigned>> map, int & x, int & y)
-{
-	for (int i = 0; i < map.size(); i++)
-	{
-		for (int j = 0; j < map[i].size(); j++)
+		if (map.body[i] == -1)
 		{
-			if (map[i][j] == -1)
-			{
-				x = i;
-				y = j;
-				return;
-			}
+			return i;
 		}
 	}
 }
 
-void LetWave(std::vector<std::vector<unsigned>> & map, unsigned index, int xEnd, int yEnd)
+void LetWave(Map & map, unsigned index, int coordinatesEnd)
 {
 	bool flag = true;
 
-	while (map[xEnd][yEnd] == end && flag)
+	while (map.body[coordinatesEnd] == end && flag)
 	{
 		flag = false; 
-		for (int i = 0; i < map.size(); i++)
+		for (int i = 0; i < map.height * map.width; i++)
 		{
-			for (int j = 0; j < map[i].size(); j++)
+			if (map.body[i] == index)
 			{
-				if (map[i][j] == index)
-				{
-					AddIndexes(map, i, j, index + 1);
-					flag = true;
-				}
+				AddIndexes(map, i, index + 1);
+				flag = true;
 			}
 		}
 		index++;
 	}
 }
 
-void GatherWay(std::vector<std::vector<unsigned>> & map, int xEnd, int yEnd)
+void GatherWay(Map & map, int coordinatesEnd)
 {
-	int index = map[xEnd][yEnd];
-	map[xEnd][yEnd] = end;
+	int coordinates = coordinatesEnd;
+	int index = map.body[coordinates];
+	map.body[coordinates] = end;
 	bool flag = true;
 	
-	while (flag)
+	while (map.body[coordinates] != start)
 	{
-		if (CheckArrayBounds(map, xEnd + 1, yEnd) && map[xEnd + 1][yEnd] == index - 1)
-		{CheckArrayBounds(map, xEnd + 1, yEnd) &&
-			xEnd++;
-		}
-		else if (CheckArrayBounds(map, xEnd - 1, yEnd) && map[xEnd - 1][yEnd] == index - 1)
+		map.body[coordinates] = way;
+		if (CheckArrayBounds(map, coordinates + 1) && map.body[coordinates + 1] == index - 1)
 		{
-			xEnd--;
+			coordinates++;
 		}
-		else if (CheckArrayBounds(map, xEnd, yEnd + 1) && map[xEnd][yEnd + 1] == index - 1)
+		else if (CheckArrayBounds(map, coordinates - 1) && map.body[coordinates - 1] == index - 1)
 		{
-			yEnd++;
+			coordinates--;
 		}
-		else if (CheckArrayBounds(map, xEnd, yEnd - 1) && map[xEnd][yEnd - 1] == index - 1)
+		else if (CheckArrayBounds(map, coordinates + map.width) && map.body[coordinates + map.width] == index - 1)
 		{
-			yEnd--;
+			coordinates += map.width;
 		}
-		else flag = false;
+		else if (CheckArrayBounds(map, coordinates - map.width) && map.body[coordinates - map.width] == index - 1)
+		{
+			coordinates -= map.width;
+		}
+		else
+		{
+			break;
+		}
 
-		if (map[xEnd][yEnd] == start) break;
-		map[xEnd][yEnd] = way;
 		index--;
+		//PrintMap(map);
 	}
+	map.body[coordinatesEnd] = end;
 }
 
-void WaveSearch(std::vector<std::vector<unsigned>> & map)
+void WaveSearch(Map & map)
 {
-	int xEnd, yEnd;
-	TakeCoordinatesEnd(map, xEnd, yEnd);
-	
-	LetWave(map, start, xEnd, yEnd);
-	GatherWay(map, xEnd, yEnd);
-
+	int coordinatesEnd = TakeCoordinatesEnd(map);
+	LetWave(map, start, coordinatesEnd);
+	GatherWay(map, coordinatesEnd);
 }
 
-bool CheckMap(std::vector<std::vector<unsigned>> map)
+bool CheckMap(Map map)
 {
 	int pointStart = 0;
 	int pointEnd = 0;
 
-	for (int i = 0; i < map.size(); i++)
+	for (int i = 0; i < map.height * map.width; i++)
 	{
-		for (int j = 0; j < map[i].size(); j++)
+		if (map.body[i] == start)
 		{
-			if (map[i][j] == start)
-			{
-				pointStart++;
-			}
-			if (map[i][j] == end)
-			{
-				pointEnd++;
-			}
+			pointStart++;
+		}
+		if (map.body[i] == end)
+		{
+			pointEnd++;
 		}
 	}
 	return  (pointStart == 1) && (pointEnd == 1);
@@ -281,15 +282,14 @@ int main(int argc, char* argv[])
 	}
 
 	bool err;
-	std::vector<std::vector<unsigned>> map = ReadFromFileMap(pFile, err);
+	Map map = ReadFromFileMap(pFile, err);
 	fclose(pFile);
-
 	if (err)
 	{
 		std::cout << "Large size of the maze." << std::endl;
 		return 1;
 	}
-
+	
 	if (!CheckMap(map))
 	{
 		std::cout << "Incorrect map." << std::endl;
@@ -297,9 +297,9 @@ int main(int argc, char* argv[])
 	}
 
 	WaveSearch(map);
-
-	FILE *outFile = fopen(argv[2], "w");
-	if (outFile == NULL)
+	
+	FILE *outFile;
+	if (fopen_s(&outFile, argv[2], "w") != 0)
 	{
 		printf("File opening error\n");
 		return 1;
