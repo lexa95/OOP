@@ -11,6 +11,11 @@ public:
 	~CBody();
 
 	void ShowDate()const;
+
+	double GetWeight()const;
+	double GetDensityt()const;
+	double GetVolume()const;
+
 	double m_density, m_volume, m_weight;
 };
 
@@ -78,10 +83,7 @@ private:
 class CCompound : public CBody
 {
 public:
-	CCompound(CBody main) :CBody(main)
-	{
-		m_array.push_back(main);
-	};
+	CCompound() :CBody(0, 0){};
 	void AddObject(CBody object)
 	{
 		m_array.push_back(object);
