@@ -2,6 +2,7 @@
 #include "Complex.h"
 #include <math.h>
 
+
 CComplex::CComplex(double real, double image)
 		:m_real(real), m_image(image)
 {
@@ -27,14 +28,78 @@ double CComplex::GetMagnitude()const
 	return atan(m_real / m_image);
 }
 
-CComplex CComplex::operator +(CComplex const& num)
+
+CComplex operator+(CComplex const& num1, CComplex const& num2)
 {
-	return CComplex(m_real + num.Re(), m_image + num.Im());
+	return CComplex(num2.Re() + num1.Re(), num2.Im() + num1.Im());
 }
 
-CComplex CComplex::operator +(double const& num)
+CComplex operator+(CComplex const& num1, double const& num2)
 {
-	return (CComplex(num) + *this);
+	return num1 + CComplex(num2);
+}
+
+CComplex operator+(double const& num1, CComplex const& num2)
+{
+	return num2 + num1;
+}
+
+CComplex CComplex::operator+()
+{
+	return CComplex(m_real, m_image);
+}
+
+
+CComplex operator-(CComplex const& num1, CComplex const& num2)
+{
+	return CComplex(num1.Re() - num2.Re(), num1.Im() - num2.Im());
+}
+
+CComplex operator-(CComplex const& num1, double const& num2)
+{
+	return num1 - CComplex(num2);
+}
+
+CComplex operator-(double const& num1, CComplex const& num2)
+{
+	return CComplex(num1) - num2;
+}
+
+CComplex CComplex::operator-()
+{
+	return CComplex(-m_real, -m_image);
+}
+
+
+CComplex operator*(CComplex num1, CComplex num2)
+{
+	return CComplex((num1.Re() * num2.Re() - num1.Im() * num2.Im()), (num1.Re() * num2.Im() + num1.Im() * num2.Re()));
+}
+
+CComplex operator*(CComplex num1, double num2)
+{
+	return num1 * CComplex(num2);
+}
+
+CComplex operator*(double num1, CComplex num2)
+{
+	return CComplex(num1) * num2;
+}
+
+
+CComplex operator/(CComplex num1, CComplex num2)
+{
+	return CComplex((num1.Re() * num2.Re() + num1.Im() * num2.Im()) / (pow(num2.Re(), 2) + pow(num2.Im(), 2)), (num2.Re() * num1.Im() - num2.Im() * num1.Re()) / (pow(num2.Re(), 2) + pow(num2.Im(), 2)));
+}
+
+CComplex operator/(CComplex num1, double num2)
+{
+	return num1 / CComplex(num2);
+}
+
+CComplex operator/(double num1, CComplex num2)
+{
+	return CComplex(num1) / num2;
 }
 
 CComplex::~CComplex()
