@@ -9,6 +9,10 @@ BOOST_AUTO_TEST_CASE(CheckTheAdditionOperator)
 	CComplex num2(rand(), rand());
 
 	CComplex num3 = num1 + num2;
-	BOOST_CHECK(num3.GetX() == num1.GetX() + num2.GetX());
-	BOOST_CHECK(num3.GetY() == num1.GetY() + num2.GetY());
+	BOOST_CHECK(num3.Re() == num1.Re() + num2.Re());
+	BOOST_CHECK(num3.Im() == num1.Im() + num2.Im());
+	
+	CComplex num4 = num2 + 2;
+	BOOST_CHECK(num4.Re() == num2.Re() + 2);
+	BOOST_CHECK(num4.Im() == num2.Im());
 }

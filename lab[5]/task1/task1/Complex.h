@@ -2,13 +2,17 @@
 class CComplex
 {
 public: 
-	CComplex(int x, int y);
-	int GetX() const;
-	int GetY() const;
+	CComplex(double real = 0, double image = 0);
+
+	double Re() const;
+	double Im() const;
+	double GetArgument()const;
+	double GetMagnitude()const;
 
 	CComplex operator +(CComplex const& num);
+	CComplex operator +(double const& num);
 	~CComplex();
 private:
-	int m_x, m_y;
+	double m_real, m_image;
 };
 
