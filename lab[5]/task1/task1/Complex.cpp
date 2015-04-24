@@ -71,35 +71,59 @@ CComplex CComplex::operator-()
 }
 
 
-CComplex operator*(CComplex num1, CComplex num2)
+CComplex operator*(CComplex const& num1, CComplex const& num2)
 {
 	return CComplex((num1.Re() * num2.Re() - num1.Im() * num2.Im()), (num1.Re() * num2.Im() + num1.Im() * num2.Re()));
 }
 
-CComplex operator*(CComplex num1, double num2)
+CComplex operator*(CComplex const& num1, double const& num2)
 {
 	return num1 * CComplex(num2);
 }
 
-CComplex operator*(double num1, CComplex num2)
+CComplex operator*(double const& num1, CComplex const& num2)
 {
 	return CComplex(num1) * num2;
 }
 
 
-CComplex operator/(CComplex num1, CComplex num2)
+CComplex operator/(CComplex const& num1, CComplex const& num2)
 {
 	return CComplex((num1.Re() * num2.Re() + num1.Im() * num2.Im()) / (pow(num2.Re(), 2) + pow(num2.Im(), 2)), (num2.Re() * num1.Im() - num2.Im() * num1.Re()) / (pow(num2.Re(), 2) + pow(num2.Im(), 2)));
 }
 
-CComplex operator/(CComplex num1, double num2)
+CComplex operator/(CComplex const& num1, double const& num2)
 {
 	return num1 / CComplex(num2);
 }
 
-CComplex operator/(double num1, CComplex num2)
+CComplex operator/(double const& num1, CComplex const& num2)
 {
 	return CComplex(num1) / num2;
+}
+
+CComplex CComplex::operator+=(CComplex const& num)
+{
+	*this = *this + num;
+	return *this;
+}
+
+CComplex CComplex::operator-=(CComplex const& num)
+{
+	*this = *this - num;
+	return *this;
+}
+
+CComplex CComplex::operator*=(CComplex const& num)
+{
+	*this = *this * num;
+	return *this;
+}
+
+CComplex CComplex::operator/=(CComplex const& num)
+{
+	*this = *this / num;
+	return *this;
 }
 
 CComplex::~CComplex()

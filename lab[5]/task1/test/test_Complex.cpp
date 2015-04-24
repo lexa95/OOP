@@ -79,3 +79,38 @@ BOOST_AUTO_TEST_CASE(CheckTheDivisionOperator)
 	BOOST_CHECK(num4.Re() == 4);
 	BOOST_CHECK(num4.Im() == -2);
 }
+
+BOOST_AUTO_TEST_CASE(CheckArithmeticOperatorsAbbreviatedRecord)
+{
+	CComplex num(5, 3);
+	CComplex num1(2, 3);
+	
+	num += num;
+	BOOST_CHECK(num.Re() == 10);
+	BOOST_CHECK(num.Im() ==  6);
+	
+	num += 2;
+	BOOST_CHECK(num.Re() == 12);
+	BOOST_CHECK(num.Im() == 6);
+	
+	num += num1;
+	BOOST_CHECK(num.Re() == 14);
+	BOOST_CHECK(num.Im() == 9);
+
+	num -= num1;
+	BOOST_CHECK(num.Re() == 12);
+	BOOST_CHECK(num.Im() == 6);
+
+	num -= 2;
+	BOOST_CHECK(num.Re() == 10);
+	BOOST_CHECK(num.Im() == 6);
+
+	num *= num1;
+	BOOST_CHECK(num.Re() == 2);
+	BOOST_CHECK(num.Im() == 42);
+
+	num /= 2;
+	BOOST_CHECK(num.Re() == 1);
+	BOOST_CHECK(num.Im() == 21);
+}
+
