@@ -1,13 +1,16 @@
 #include "stdafx.h"
 #include "Complex.h"
-
+
+
 double StringToDouble(const char * str, bool & err)
 {
 	char * pLastChar = NULL;
 	double param = strtod(str, &pLastChar);
 	err = ((*str == '\0') || (*pLastChar != '\0'));
 	return param;
-}CComplex::CComplex(double real, double image)
+}
+
+CComplex::CComplex(double real, double image)
 		:m_real(real), m_image(image)
 {
 }
