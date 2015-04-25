@@ -1,6 +1,40 @@
 #include "stdafx.h"
 #include "Vector3D.h"
 
+std::vector<std::string> SplitString(std::string line, std::string separator)
+{
+	std::vector<std::string> result;
+
+	line += ", ";
+	std::string str = "";
+	size_t i = 0;
+	while (i < line.size())
+	{
+		if (separator == line.substr(i, separator.size()))
+		{
+			if (str != "")
+			{
+				result.push_back(str);
+			}
+			str = "";
+			i += separator.size();
+		}
+		else
+		{
+			str += line[i];
+			i++;
+		}
+	}
+	return result;
+}
+
+double StringToDouble(const char * str, bool & err)
+{
+	char * pLastChar = NULL;
+	double param = strtod(str, &pLastChar);
+	err = ((*str == '\0') || (*pLastChar != '\0'));
+	return param;
+}
 
 CVector3D::CVector3D()
 			:x(0), y(0), z(0)
@@ -70,4 +104,75 @@ CVector3D operator+(CVector3D const& vector1, CVector3D const& vector2)
 CVector3D operator-(CVector3D const& vector1, CVector3D const& vector2)
 {
 	return CVector3D(vector1.GetX() - vector2.GetX(), vector1.GetY() - vector2.GetY(), vector1.GetZ() - vector2.GetZ());
+}
+
+/*
+CVector3D operator+=(CVector3D const& vector)
+{
+	return	CVector3D();
+}
+
+CVector3D operator-=(CVector3D const& vector)
+{
+	return	CVector3D();
+}
+*/
+
+CVector3D operator*(CVector3D const& vector, double const& num)
+{
+	return	CVector3D(vector.GetX() * num, vector.GetY() * num, vector.GetZ() * num);
+}
+
+CVector3D operator*(double const& num, CVector3D const& vector)
+{
+	return	CVector3D(vector.GetX() * num, vector.GetY() * num, vector.GetZ() * num);
+}
+
+CVector3D operator/(CVector3D const& vector, double const& num)
+{
+	return CVector3D(vector.GetX() / num, vector.GetY() / num, vector.GetZ() / num);
+}
+
+CVector3D operator/(double const& num, CVector3D const& vector)
+{
+	return CVector3D(vector.GetX() / num, vector.GetY() / num, vector.GetZ() / num);
+}
+
+std::ostream& operator<<(std::ostream& os, CVector3D const& vector)
+{
+	os << vector.GetX() << ", " << vector.GetY() << ", " << vector.GetZ();
+	return os;
+}
+
+std::istream& operator>>(std::istream& is, CVector3D & num)
+{
+	std::string line;
+	std::getline(is, line);
+	double x, y, z;
+	
+	auto values = SplitString(line, ", ");
+	if (values.size() == 3)
+	{
+		bool err;
+		x = StringToDouble(values[0].c_str(), err);
+		if (err)
+		{
+			return is;
+		}
+
+		y = StringToDouble(values[1].c_str(), err);
+		if (err)
+		{
+			return is;
+		}
+
+		z = StringToDouble(values[2].c_str(), err);
+		if (err)
+		{
+			return is;
+		}
+
+		num = CVector3D(x, y, z);
+	}
+	return is;
 }
