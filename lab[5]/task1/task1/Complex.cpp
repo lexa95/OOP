@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Complex.h"
 #include <math.h>
-
+#include <float.h>
 
 CComplex::CComplex(double real, double image)
 		:m_real(real), m_image(image)
@@ -102,6 +102,7 @@ CComplex operator/(double const& num1, CComplex const& num2)
 	return CComplex(num1) / num2;
 }
 
+
 CComplex CComplex::operator+=(CComplex const& num)
 {
 	*this = *this + num;
@@ -124,6 +125,16 @@ CComplex CComplex::operator/=(CComplex const& num)
 {
 	*this = *this / num;
 	return *this;
+}
+
+bool operator==(CComplex const& num1, CComplex const& num2)
+{
+	return (fabs(num1.Re() - num2.Re()) < DBL_MIN) && (fabs(num1.Im() - num2.Im()) < DBL_MIN);
+}
+
+bool operator!=(CComplex const& num1, CComplex const& num2)
+{
+	return !(num1 == num2);
 }
 
 CComplex::~CComplex()

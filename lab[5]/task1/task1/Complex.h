@@ -33,6 +33,9 @@ public:
 	CComplex operator*=(CComplex const& num);
 	CComplex operator/=(CComplex const& num);
 
+	friend bool operator==(CComplex const& num1, CComplex const& num2);
+	friend bool operator!=(CComplex const& num1, CComplex const& num2);
+
 	~CComplex();
 private:
 	double m_real, m_image;

@@ -112,5 +112,27 @@ BOOST_AUTO_TEST_CASE(CheckArithmeticOperatorsAbbreviatedRecord)
 	num /= 2;
 	BOOST_CHECK(num.Re() == 1);
 	BOOST_CHECK(num.Im() == 21);
+
+	num != num1;
+	2 != num;
+	num != 3;
 }
 
+BOOST_AUTO_TEST_CASE(TestComparisonOperators)
+{
+	CComplex num(5, 3);
+	CComplex num1(5, 3);
+	CComplex num2(1, 3);
+	CComplex num3(5, 1);
+	
+	BOOST_CHECK(num == num1);
+	BOOST_CHECK(!(num != num1));
+
+	BOOST_CHECK(!(num == num2));
+	BOOST_CHECK(!(num == num3));
+	BOOST_CHECK(num != num2);
+	BOOST_CHECK(num != num3);
+
+	BOOST_CHECK(!(num3 == num2));
+	BOOST_CHECK(num2 != num3);
+}
