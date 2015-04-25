@@ -1,4 +1,11 @@
 #pragma once
+
+#include <iostream>
+#include <fstream>
+#include <float.h>
+#include <math.h>
+#include <string>
+
 class CComplex
 {
 public: 
@@ -10,23 +17,23 @@ public:
 	double GetMagnitude()const;
 
 	friend CComplex operator+(CComplex const& num1, CComplex const& num2);
-	friend CComplex operator+(CComplex const& num1, double const& num2);
-	friend CComplex operator+(double const& num1, CComplex const& num2);
+	//friend CComplex operator+(CComplex const& num1, double const& num2);
+	//friend CComplex operator+(double const& num1, CComplex const& num2);
 	CComplex operator+();
 
 	friend CComplex operator-(CComplex const& num1, CComplex const& num2);
-	friend CComplex operator-(CComplex const& num1, double const& num2);
-	friend CComplex operator-(double const& num1, CComplex const& num2);
+	//friend CComplex operator-(CComplex const& num1, double const& num2);
+	//friend CComplex operator-(double const& num1, CComplex const& num2);
 	CComplex operator-();
 
 	friend CComplex operator*(CComplex const& num1, CComplex const& num2);
-	friend CComplex operator*(CComplex const& num1, double const& num2);
-	friend CComplex operator*(double const& num1, CComplex const& num2);
+	//friend CComplex operator*(CComplex const& num1, double const& num2);
+	//friend CComplex operator*(double const& num1, CComplex const& num2);
 
 
 	friend CComplex operator/(CComplex const& num1, CComplex const& num2);
-	friend CComplex operator/(CComplex const& num1, double const& num2);
-	friend CComplex operator/(double const& num1, CComplex const& num2);
+	//friend CComplex operator/(CComplex const& num1, double const& num2);
+	//friend CComplex operator/(double const& num1, CComplex const& num2);
 
 	CComplex operator+=(CComplex const& num);
 	CComplex operator-=(CComplex const& num);
@@ -35,6 +42,9 @@ public:
 
 	friend bool operator==(CComplex const& num1, CComplex const& num2);
 	friend bool operator!=(CComplex const& num1, CComplex const& num2);
+
+	friend std::ostream& operator<<(std::ostream& os, CComplex const& num);
+	friend std::istream& operator>>(std::istream& is, CComplex & num);
 
 	~CComplex();
 private:
