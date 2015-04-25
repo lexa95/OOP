@@ -41,7 +41,7 @@ std::string RemoveExtraSpaces(std::string const& arg)
 
 	std::string result = MergeSymbol(arg, ' ');
 
-	if (result.back() == ' ')
+	if (result.size() > 0 && result.back() == ' ')
 	{
 		result.pop_back();
 	}
