@@ -192,3 +192,32 @@ CVector3D CVector3D::operator/=(double const& num)
 	this->z /= num;
 	return *this;
 }
+
+CVector3D CVector3D::operator+=(CVector3D const& vector)
+{
+	double len = GetLength() + vector.GetLength();
+	double value = len / GetLength();
+	x *= value;
+	y *= value;
+	z *= value;
+	return *this;
+}
+
+CVector3D CVector3D::operator-=(CVector3D const& vector)
+{
+	double len = GetLength() - vector.GetLength();
+	double value = GetLength() / len;
+	if (value > 0)
+	{
+		x /= value;
+		y /= value;
+		z /= value;
+	}
+	else
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+	return *this;
+}
