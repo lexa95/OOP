@@ -34,8 +34,8 @@ public:
 	friend CVector3D operator/(CVector3D const& vector1, double const& num);
 	friend CVector3D operator/(double const& num, CVector3D const& vector2);
 	
-	//CVector3D operator*=(CVector3D const& vector);
-	//CVector3D operator/=(CVector3D const& vector);
+	CVector3D operator*=(double const& num);
+	CVector3D operator/=(double const& num);
 
 	friend bool operator==(CVector3D const& vector1, CVector3D const& vector2);
 	friend bool operator!=(CVector3D const& vector1, CVector3D const& vector2);

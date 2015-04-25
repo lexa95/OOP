@@ -176,3 +176,19 @@ std::istream& operator>>(std::istream& is, CVector3D & num)
 	}
 	return is;
 }
+
+CVector3D CVector3D::operator*=(double const& num)
+{
+	this->x *= num;
+	this->y *= num;
+	this->z *= num;
+	return *this;
+}
+
+CVector3D CVector3D::operator/=(double const& num)
+{
+	this->x /= num;
+	this->y /= num;
+	this->z /= num;
+	return *this;
+}
