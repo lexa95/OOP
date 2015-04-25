@@ -20,8 +20,8 @@ public:
 	CVector3D operator+();
 	CVector3D operator-();
 
-	//friend CVector3D operator+(CVector3D const& vector1, CVector3D const& vector2);
-	//friend CVector3D operator-(CVector3D const& vector1, CVector3D const& vector2);
+	friend CVector3D operator+(CVector3D const& vector1, CVector3D const& vector2);
+	friend CVector3D operator-(CVector3D const& vector1, CVector3D const& vector2);
 
 	//CVector3D operator+=(CVector3D const& vector);
 	//CVector3D operator-=(CVector3D const& vector);

@@ -61,3 +61,13 @@ bool operator!=(CVector3D const& vector1, CVector3D const& vector2)
 {
 	return !(vector1 == vector2);
 }
+
+CVector3D operator+(CVector3D const& vector1, CVector3D const& vector2)
+{
+	return CVector3D(vector1.GetX() + vector2.GetX(), vector1.GetY() + vector2.GetY(), vector1.GetZ() + vector2.GetZ());
+}
+
+CVector3D operator-(CVector3D const& vector1, CVector3D const& vector2)
+{
+	return CVector3D(vector1.GetX() - vector2.GetX(), vector1.GetY() - vector2.GetY(), vector1.GetZ() - vector2.GetZ());
+}

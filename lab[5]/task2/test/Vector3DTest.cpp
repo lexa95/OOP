@@ -20,3 +20,13 @@ BOOST_AUTO_TEST_CASE(TestComparisonOperators)
 	BOOST_CHECK(!(vector1 == vector3));
 	BOOST_CHECK(vector1   != vector3);
 }
+
+BOOST_AUTO_TEST_CASE(ByOperatorsOfBinaryAdditionAndSubtraction)
+{
+	CVector3D vector1(1, 2, 3);
+	CVector3D vector2(3, 2, 1);
+	CVector3D vector3(4, 4, 4);
+	CVector3D vector4(2, 0, -2);
+	BOOST_CHECK((vector1 + vector2) == vector3);
+	BOOST_CHECK((vector2 - vector1) == vector4);
+}
