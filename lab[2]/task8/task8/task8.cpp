@@ -59,6 +59,5 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	system("PAUSE");
 	return 0;
 }
