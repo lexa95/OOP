@@ -6,35 +6,35 @@ using namespace std;
 bool WriteFromFileInFile(const char * nameInputFile, const char * nameOutputFile,
 	const map<string, string> params, string(*Process)(string tpl, map<string, string> params))
 {
-	ifstream pInputFile(nameInputFile);
-	if (!pInputFile.is_open())
+	ifstream inputFile(nameInputFile);
+	if (!inputFile.is_open())
 	{
 		printf("File opening error\n");
-		return true;
+		return false;
 	}
 
-	ofstream pOutputFile(nameOutputFile);
-	if (!pOutputFile.is_open())
+	ofstream outputFile(nameOutputFile);
+	if (!outputFile.is_open())
 	{
 		printf("File opening error\n");
-		pInputFile.close();
-		return true;
+		inputFile.close();
+		return false;
 	}
 
 	string line;
-	while (!pInputFile.eof())
+	while (!inputFile.eof())
 	{
-		getline(pInputFile, line);
-		pOutputFile << Process(line, params);
-		pOutputFile << "\n";
+		getline(inputFile, line);
+		outputFile << Process(line, params);
+		outputFile << "\n";
 	}
 
-	pInputFile.close();
-	pOutputFile.close();
-	return false;
+	inputFile.close();
+	outputFile.close();
+	return true;
 }
 
-map<string, string> createMap(int count, char* argv[])
+map<string, string> CreateMap(int count, char* argv[])
 {
 	map<string, string> result;
 	for (int i = 3; i < count; i += 2)
@@ -46,17 +46,15 @@ map<string, string> createMap(int count, char* argv[])
 
 int main(int argc, char* argv[])
 {
-	setlocale(LC_ALL, "rus");
-
 	if (argc % 2 == 0 || argc < 3)
 	{
 		cout << "Не верное кол-во параметров." << endl;
 		return 1;
 	}
 
-	map<string, string> params = createMap(argc, argv);
+	map<string, string> params = CreateMap(argc, argv);
 	
-	if (WriteFromFileInFile(argv[1], argv[2], params, ExpandTemplate))
+	if (!WriteFromFileInFile(argv[1], argv[2], params, ExpandTemplate))
 	{
 		return -1;
 	}
