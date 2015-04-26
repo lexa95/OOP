@@ -40,11 +40,17 @@ void DisplaysInformationAboutErrorSetSpeed(int speed, CCar car)
 {
 	auto speedRange = car.GetSpeedRange();
 
+	if (!car.IsTurnedOn())
+	{
+		cout << "Двигатель выключен." << endl;
+		return;
+	}
+
 	if (speed >= speedRange[car.GetGear()][0] && speed <= speedRange[car.GetGear()][1])
 	{
 		if (car.GetGear() == 0 && car.GetSpeed() < speed)
 		{
-			cout << "На нейтральной можно изменить только в сторону нуля.";
+			cout << "На нейтральной можно изменить только в сторону нуля." << endl;
 			return;
 		}
 	}
@@ -94,7 +100,8 @@ int StringToInt(const char * str, bool & err)
 	int param = strtol(str, &pLastChar, 10);
 	err = ((*str == '\0') || (*pLastChar != '\0'));
 	return param;
-}
+}
+
 void UseTheCommand(string command, CCar & car)
 {
 	if (command == "Info")
@@ -120,7 +127,7 @@ void UseTheCommand(string command, CCar & car)
 		}
 		else
 		{
-			cout << "Не удалось выключить двигате.";
+			cout << "Не удалось выключить двигатель." << endl;
 			/*if (car.GetSpeed() != 0)
 			{
 				cout << "Скорость не равна нулю." << endl;
@@ -175,6 +182,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "Enter: " << std::endl;
 	bool isChangeDictionary = false;
+
 	while (!std::cin.eof())
 	{
 		std::string line;
