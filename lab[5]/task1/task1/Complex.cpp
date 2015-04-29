@@ -35,7 +35,7 @@ double CComplex::GetMagnitude()const
 	return atan(m_real / m_image);
 }
 
-CComplex operator+(CComplex const& num1, CComplex const& num2)
+CComplex const operator+(CComplex const& num1, CComplex const& num2)
 {
 	return CComplex(num2.Re() + num1.Re(), num2.Im() + num1.Im());
 }
@@ -55,8 +55,7 @@ CComplex CComplex::operator+()
 	return CComplex(m_real, m_image);
 }
 
-
-CComplex operator-(CComplex const& num1, CComplex const& num2)
+CComplex const operator-(CComplex const& num1, CComplex const& num2)
 {
 	return CComplex(num1.Re() - num2.Re(), num1.Im() - num2.Im());
 }
@@ -76,8 +75,7 @@ CComplex CComplex::operator-()
 	return CComplex(-m_real, -m_image);
 }
 
-
-CComplex operator*(CComplex const& num1, CComplex const& num2)
+CComplex const operator*(CComplex const& num1, CComplex const& num2)
 {
 	return CComplex((num1.Re() * num2.Re() - num1.Im() * num2.Im()), (num1.Re() * num2.Im() + num1.Im() * num2.Re()));
 }
@@ -93,7 +91,7 @@ CComplex operator*(CComplex const& num1, CComplex const& num2)
 //}
 
 
-CComplex operator/(CComplex const& num1, CComplex const& num2)
+CComplex const operator/(CComplex const& num1, CComplex const& num2)
 {
 	return CComplex((num1.Re() * num2.Re() + num1.Im() * num2.Im()) / (pow(num2.Re(), 2) + pow(num2.Im(), 2)), (num2.Re() * num1.Im() - num2.Im() * num1.Re()) / (pow(num2.Re(), 2) + pow(num2.Im(), 2)));
 }
@@ -159,36 +157,48 @@ std::ostream& operator<<(std::ostream& os, CComplex const& num)
 std::istream& operator>>(std::istream& is, CComplex & num)
 {
 	std::string value, str_num;
-	double real, image;
+	double real = 0, image = 0;
 	is >> value;
 	bool err;
 
-	str_num += value[0];
-	for (size_t i = 1; i < value.size(); i++)
+	if (value.size() == 1)
 	{
-		if (value[i] == 'i')
+		real = StringToDouble(value.c_str(), err);
+		if (err)
 		{
-			image = StringToDouble(str_num.c_str(), err);
-			if (err)
-			{
-				std::cout << "error input" << std::endl;
-			}
-			str_num = "";
-		}
-		else if (value[i] == '-' || value[i] == '+')
-		{
-			real = StringToDouble(str_num.c_str(), err);
-			if (err)
-			{
-				std::cout << "error input" << std::endl;
-			}
-			str_num = value[i];
-		}
-		else
-		{
-			str_num += value[i];
+			std::cout << "error input" << std::endl;
 		}
 	}
+	else
+	{
+		str_num += value[0];
+		for (size_t i = 1; i < value.size(); i++)
+		{
+			if (value[i] == 'i')
+			{
+				image = StringToDouble(str_num.c_str(), err);
+				if (err)
+				{
+					std::cout << "error input" << std::endl;
+				}
+				str_num = "";
+			}
+			else if (value[i] == '-' || value[i] == '+')
+			{
+				real = StringToDouble(str_num.c_str(), err);
+				if (err)
+				{
+					std::cout << "error input" << std::endl;
+				}
+				str_num = value[i];
+			}
+			else
+			{
+				str_num += value[i];
+			}
+		}
+	}
+
 	num = CComplex(real, image);
 	return is;
 }

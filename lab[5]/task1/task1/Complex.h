@@ -16,22 +16,22 @@ public:
 	double GetArgument()const;
 	double GetMagnitude()const;
 
-	friend CComplex operator+(CComplex const& num1, CComplex const& num2);
+	friend const CComplex operator+(CComplex const& num1, CComplex const& num2);
 	//friend CComplex operator+(CComplex const& num1, double const& num2);
 	//friend CComplex operator+(double const& num1, CComplex const& num2);
 	CComplex operator+();
 
-	friend CComplex operator-(CComplex const& num1, CComplex const& num2);
+	friend const CComplex operator-(CComplex const& num1, CComplex const& num2);
 	//friend CComplex operator-(CComplex const& num1, double const& num2);
 	//friend CComplex operator-(double const& num1, CComplex const& num2);
 	CComplex operator-();
 
-	friend CComplex operator*(CComplex const& num1, CComplex const& num2);
+	friend const CComplex operator*(CComplex const& num1, CComplex const& num2);
 	//friend CComplex operator*(CComplex const& num1, double const& num2);
 	//friend CComplex operator*(double const& num1, CComplex const& num2);
 
 
-	friend CComplex operator/(CComplex const& num1, CComplex const& num2);
+	friend const CComplex operator/(CComplex const& num1, CComplex const& num2);
 	//friend CComplex operator/(CComplex const& num1, double const& num2);
 	//friend CComplex operator/(double const& num1, CComplex const& num2);
 
