@@ -8,12 +8,11 @@ CBody::CBody(double density, double volume)
 	m_weight = density * volume;
 }
 
-void CBody::ShowDate() const
+void CBody::ShowDate(std::ostream & output) const
 {
-	std::cout << "Density = " << m_density << std::endl;
-	std::cout << "Volume  = " << m_volume  << std::endl;
-	std::cout << "Weight  = " << m_weight  << std::endl;
-	//std::cout << "=======================" << std::endl;
+	output << "Density = " << m_density << std::endl;
+	output << "Volume  = " << m_volume << std::endl;
+	output << "Weight  = " << m_weight << std::endl;
 }
 
 double CBody::GetWeight() const

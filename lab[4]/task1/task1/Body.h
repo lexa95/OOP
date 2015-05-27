@@ -8,9 +8,9 @@ class CBody
 {
 public:
 	CBody(double density, double volume);
-	~CBody();
+	virtual ~CBody();
 
-	void ShowDate()const;
+	void ShowDate(std::ostream & output)const;
 
 	double GetWeight()const;
 	double GetDensityt()const;
@@ -86,8 +86,13 @@ public:
 	CCompound() :CBody(0, 0){};
 	void AddObject(CBody object)
 	{
-		m_array.push_back(object);
-		UpdateDate();
+		CBody * myObject = &object;
+		CCompound * temp = dynamic_cast<CCompound*>(myObject);
+		if (temp)
+		{
+			m_array.push_back(object);
+			UpdateDate();
+		}
 	}
 	
 private:

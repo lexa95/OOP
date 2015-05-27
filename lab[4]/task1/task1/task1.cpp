@@ -2,6 +2,7 @@
 #include "Body.h"
 #include <string>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ int StringToInt(const char * str, bool & err)
 	return param;
 }
 
-vector<int> GetValuesFromStrings(string str)
+vector<int> GetValuesFromStrings(string str, bool & err)
 {
 	vector<int> values;
 	str += ' ';
@@ -22,12 +23,12 @@ vector<int> GetValuesFromStrings(string str)
 	{
 		if (num != "" && str[i] == ' ')
 		{
-			bool err;
 			values.push_back(StringToInt(num.c_str(), err));
 			if (err)
 			{
-				//error
+				cout << "incorrect parameters" << endl;
 			}
+			err = !err;
 			num = "";
 		}
 		else
@@ -49,7 +50,7 @@ CBody ApplyOperation(string & const line, bool & err)
 
 	if (line.substr(0, Sphere.size()) == Sphere)
 	{
-		auto values = GetValuesFromStrings(line.substr(Sphere.size()));
+		auto values = GetValuesFromStrings(line.substr(Sphere.size()), err);
 		if (values.size() == 2)
 		{
 			return CSphere(values[0], values[1]);
@@ -63,7 +64,7 @@ CBody ApplyOperation(string & const line, bool & err)
 	}
 	else if (line.substr(0, Parallelepiped.size()) == Parallelepiped)
 	{
-		auto values = GetValuesFromStrings(line.substr(Parallelepiped.size()));
+		auto values = GetValuesFromStrings(line.substr(Parallelepiped.size()), err);
 		if (values.size() == 4)
 		{
 			return CParallelepiped(values[0], values[1], values[2], values[3]);
@@ -77,7 +78,7 @@ CBody ApplyOperation(string & const line, bool & err)
 	}
 	else if (line.substr(0, Cone.size()) == Cone)
 	{
-		auto values = GetValuesFromStrings(line.substr(Cone.size()));
+		auto values = GetValuesFromStrings(line.substr(Cone.size()), err);
 		if (values.size() == 3)
 		{
 			return CCone(values[0], values[1], values[2]);
@@ -91,7 +92,7 @@ CBody ApplyOperation(string & const line, bool & err)
 	}
 	else if (line.substr(0, Cylinder.size()) == Cylinder)
 	{
-		auto values = GetValuesFromStrings(line.substr(Cylinder.size()));
+		auto values = GetValuesFromStrings(line.substr(Cylinder.size()), err);
 		if (values.size() == 3)
 		{
 			return CCylinder(values[0], values[1], values[2]);
@@ -108,10 +109,10 @@ CBody ApplyOperation(string & const line, bool & err)
 		cout << "Does not recognize the command." << endl;
 		err = false;
 	}
-	return CSphere(0, 0);
+	return CBody(0, 0);
 }
 
-vector<CBody> InteractionWithTheUser()
+vector<CBody> InteractionWithTheUser(istream & input)
 {
 	const string Commpound = "Commpound";
 	std::string line;
@@ -119,7 +120,7 @@ vector<CBody> InteractionWithTheUser()
 	cout << ">";
 	bool flag = false;
 
-	while (getline(std::cin, line))
+	while (getline(input, line))
 	{
 		if (line == Commpound)
 		{
@@ -128,12 +129,7 @@ vector<CBody> InteractionWithTheUser()
 			CCompound compoundShape;
 			while (true)
 			{
-				getline(std::cin, line);
-				if (line == "exit")
-				{
-					result.push_back(compoundShape);
-					break;
-				}
+				getline(input, line);
 				bool err;
 				auto shape = ApplyOperation(line, err);
 				if (err)
@@ -142,6 +138,7 @@ vector<CBody> InteractionWithTheUser()
 				}
 				cout << ">>";
 			}
+			result.push_back(compoundShape);
 		}
 		else
 		{
@@ -154,15 +151,16 @@ vector<CBody> InteractionWithTheUser()
 		}
 		cout << ">";
 	}
+	cout << endl;
 	return result;
 }
 
 double GetSubmergedWeight(double p, double v)
 {
-	return (p - 999, 97)* 9.8 * v;
+	return (p - 1000)* 9.8 * v;
 }
 
-void PrintLargestMass(vector<CBody> const & array) 
+void PrintLargestMass(vector<CBody> const & array, std::ostream& output)
 {
 	size_t length = array.size();
 	size_t index = 0;
@@ -174,29 +172,74 @@ void PrintLargestMass(vector<CBody> const & array)
 		}
 	}
 
-	cout << "====== large mass ======" << endl;
-	array[index].ShowDate();
-	cout << "========================" << endl;
+	array[index].ShowDate(output);
+}
 
-	index = 0;
+void PrintEasiestInWater(vector<CBody> const & array, std::ostream& output)
+{
+	size_t length = array.size();
+	size_t index = 0;
 	for (size_t i = 0; i < length; i++)
 	{
-		if (GetSubmergedWeight(array[index].GetDensityt(), array[index].GetVolume()) > GetSubmergedWeight(array[i].GetDensityt(), array[i].GetVolume()))
+		if (GetSubmergedWeight(array[index].GetDensityt(), array[index].GetVolume())
+						> GetSubmergedWeight(array[i].GetDensityt(), array[i].GetVolume()))
 		{
 			index = i;
 		}
 	}
+	array[index].ShowDate(output);
+}
 
-	cout << "=== easiest in water ===" << endl;
-	array[index].ShowDate();
-	cout << "========================" << endl;
+void PrintLargestMassAndEasiestInWater(vector<CBody> const & array, std::ostream& output)
+{
+	if (array.size() != 0)
+	{
+		output << "====== large mass ======" << endl;
+		PrintLargestMass(array, output);
+		output << "========================" << endl;
+
+		output << "=== easiest in water ===" << endl;
+		PrintEasiestInWater(array, output);
+		output << "========================" << endl;
+	}
 }
 
 int main(int argc, char* argv[])
 {
-	auto array = InteractionWithTheUser();
-	PrintLargestMass(array);
-	system("pause");
+	vector<CBody> objects;
+	if (argc == 1)
+	{
+		objects = InteractionWithTheUser(std::cin);
+		PrintLargestMassAndEasiestInWater(objects, std::cout);
+	}
+	else if (argc == 2 || argc == 3)
+	{
+		std::ifstream file(argv[1]);
+		if (!file.is_open())
+		{
+			std::cout << "Could not open file" << endl;
+			return 1;
+		}
+		objects = InteractionWithTheUser(file);
+		file.close();
+
+		if (argc == 3)
+		{
+			ofstream outFile(argv[2]);
+			PrintLargestMassAndEasiestInWater(objects, outFile);
+			outFile.close();
+		}
+		else
+		{
+			PrintLargestMassAndEasiestInWater(objects, std::cout);
+		}
+		
+	}
+	else
+	{
+		std::cout << "wrong number of parameters" << std::endl;
+		return 1;
+	}
+
 	return 0;
 }
-
