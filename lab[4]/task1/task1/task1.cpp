@@ -5,6 +5,7 @@
 #include <fstream>
 
 using namespace std;
+typedef boost::shared_ptr<CBody> SPtr;
 
 int StringToInt(const char * str, bool & err)
 {
@@ -14,46 +15,68 @@ int StringToInt(const char * str, bool & err)
 	return param;
 }
 
-vector<int> GetValuesFromStrings(string str, bool & err)
+vector<string> SplitString(string line, string const& separator)
 {
-	vector<int> values;
-	str += ' ';
-	string num = "";
-	for (size_t i = 0; i < str.size(); i++)
+	vector<string> result;
+
+	line += separator;
+	string str = "";
+	size_t i = 0;
+	while (i < line.size())
 	{
-		if (num != "" && str[i] == ' ')
+		if (separator == line.substr(i, separator.size()))
 		{
-			values.push_back(StringToInt(num.c_str(), err));
-			if (err)
+			if (str != "")
 			{
-				cout << "incorrect parameters" << endl;
+				result.push_back(str);
 			}
-			err = !err;
-			num = "";
+			str = "";
+			i += separator.size();
 		}
 		else
 		{
-			num += str[i];
+			str += line[i];
+			i++;
 		}
 	}
-	return values;
+	return result;
 }
 
-CBody ApplyOperation(string & const line, bool & err)
+vector<int> GetArrayIntFromArrayString(vector<string> array, bool & err)
+{
+	vector<int> result;
+
+	for (size_t i = 0; i < array.size(); i++)
+	{
+		auto value = StringToInt(array[i].c_str(), err);
+
+		if (err)
+		{
+			break;
+		}
+
+		result.push_back(value);
+	}
+
+	return result;
+}
+
+SPtr ApplyOperation(string const& line, bool & err, istream & input)
 {
 	const string Sphere = "Sphere";
 	const string Parallelepiped = "Parallelepiped";
 	const string Cone = "Cone";
 	const string Cylinder = "Cylinder";
-
-	err = true;
-
+	const string Commpound = "Commpound"; 
+	
 	if (line.substr(0, Sphere.size()) == Sphere)
 	{
-		auto values = GetValuesFromStrings(line.substr(Sphere.size()), err);
-		if (values.size() == 2)
+		auto values = GetArrayIntFromArrayString(SplitString(line.substr(Sphere.size()), " "), err);
+
+		if (values.size() == 2 && !err)
 		{
-			return CSphere(values[0], values[1]);
+			err = true;
+			return SPtr(new CSphere(values[0], values[1]));
 		}
 		else
 		{
@@ -62,12 +85,13 @@ CBody ApplyOperation(string & const line, bool & err)
 			err = false;
 		}
 	}
-	else if (line.substr(0, Parallelepiped.size()) == Parallelepiped)
+	else if (line.substr(0, Parallelepiped.size()) == Parallelepiped )
 	{
-		auto values = GetValuesFromStrings(line.substr(Parallelepiped.size()), err);
-		if (values.size() == 4)
+		auto values = GetArrayIntFromArrayString(SplitString(line.substr(Parallelepiped.size()), " "), err);
+		if (values.size() == 4 && !err)
 		{
-			return CParallelepiped(values[0], values[1], values[2], values[3]);
+			err = true;
+			return SPtr(new CParallelepiped(values[0], values[1], values[2], values[3]));
 		}
 		else
 		{
@@ -78,10 +102,11 @@ CBody ApplyOperation(string & const line, bool & err)
 	}
 	else if (line.substr(0, Cone.size()) == Cone)
 	{
-		auto values = GetValuesFromStrings(line.substr(Cone.size()), err);
-		if (values.size() == 3)
+		auto values = GetArrayIntFromArrayString(SplitString(line.substr(Cone.size()), " "), err);
+		if (values.size() == 3 && !err)
 		{
-			return CCone(values[0], values[1], values[2]);
+			err = true;
+			return SPtr(new CCone(values[0], values[1], values[2]));
 		}
 		else
 		{
@@ -92,10 +117,11 @@ CBody ApplyOperation(string & const line, bool & err)
 	}
 	else if (line.substr(0, Cylinder.size()) == Cylinder)
 	{
-		auto values = GetValuesFromStrings(line.substr(Cylinder.size()), err);
-		if (values.size() == 3)
+		auto values = GetArrayIntFromArrayString(SplitString(line.substr(Cylinder.size()), " "), err);
+		if (values.size() == 3 && !err)
 		{
-			return CCylinder(values[0], values[1], values[2]);
+			err = true;
+			return SPtr(new CCylinder(values[0], values[1], values[2]));
 		}
 		else
 		{
@@ -104,55 +130,48 @@ CBody ApplyOperation(string & const line, bool & err)
 			err = false;
 		}
 	}
-	else 
+	else if (line.substr(0, Commpound.size()) == Commpound)
+	{
+		SPtr shape(new CCompound);
+		CCompound * temp = dynamic_cast<CCompound*>(shape.get());
+		string str;
+		while (getline(input, str))
+		{
+			if ("exit" == str)
+			{
+				break;
+			}
+
+			auto addShape = ApplyOperation(str, err, input);
+			if (err)
+			{
+				(*temp).AddShape(addShape);
+			}
+		}
+		return shape;
+	}
+	else
 	{
 		cout << "Does not recognize the command." << endl;
 		err = false;
 	}
-	return CBody(0, 0);
+	return SPtr();
 }
 
-vector<CBody> InteractionWithTheUser(istream & input)
+template <typename T>
+void AddShapes(istream & input, T & shapes)
 {
-	const string Commpound = "Commpound";
 	std::string line;
-	std::vector<CBody> result;
-	cout << ">";
-	bool flag = false;
+	bool err;
 
 	while (getline(input, line))
 	{
-		if (line == Commpound)
+		auto shape = ApplyOperation(line, err, input);
+		if (err)
 		{
-			cout << "Entry of a composite body type exit." << endl;
-			cout << ">>";
-			CCompound compoundShape;
-			while (true)
-			{
-				getline(input, line);
-				bool err;
-				auto shape = ApplyOperation(line, err);
-				if (err)
-				{
-					compoundShape.AddObject(shape);
-				}
-				cout << ">>";
-			}
-			result.push_back(compoundShape);
+			shapes.push_back(shape);
 		}
-		else
-		{
-			bool err;
-			auto shape = ApplyOperation(line, err);
-			if (err)
-			{
-				result.push_back(shape);
-			}
-		}
-		cout << ">";
 	}
-	cout << endl;
-	return result;
 }
 
 double GetSubmergedWeight(double p, double v)
@@ -160,37 +179,37 @@ double GetSubmergedWeight(double p, double v)
 	return (p - 1000)* 9.8 * v;
 }
 
-void PrintLargestMass(vector<CBody> const & array, std::ostream& output)
+void PrintLargestMass(vector<SPtr> const & array, std::ostream& output)
 {
 	size_t length = array.size();
 	size_t index = 0;
 	for (size_t i = 0; i < length; i++)
 	{
-		if (array[index].GetWeight() < array[i].GetWeight())
+		if ((*array[index].get()).GetWeight() < (*array[i].get()).GetWeight())
 		{
 			index = i;
 		}
 	}
 
-	array[index].ShowDate(output);
+	(*array[index].get()).ShowDate(output);
 }
 
-void PrintEasiestInWater(vector<CBody> const & array, std::ostream& output)
+void PrintEasiestInWater(vector<SPtr> const & array, std::ostream& output)
 {
 	size_t length = array.size();
 	size_t index = 0;
 	for (size_t i = 0; i < length; i++)
 	{
-		if (GetSubmergedWeight(array[index].GetDensityt(), array[index].GetVolume())
-						> GetSubmergedWeight(array[i].GetDensityt(), array[i].GetVolume()))
+		if (GetSubmergedWeight((*array[index].get()).GetDensity(), (*array[index].get()).GetVolume())
+	> GetSubmergedWeight((*array[i].get()).GetDensity(), (*array[i].get()).GetVolume()))
 		{
 			index = i;
 		}
 	}
-	array[index].ShowDate(output);
+	(*array[index].get()).ShowDate(output);
 }
 
-void PrintLargestMassAndEasiestInWater(vector<CBody> const & array, std::ostream& output)
+void PrintLargestMassAndEasiestInWater(vector<SPtr> const & array, std::ostream& output)
 {
 	if (array.size() != 0)
 	{
@@ -204,13 +223,23 @@ void PrintLargestMassAndEasiestInWater(vector<CBody> const & array, std::ostream
 	}
 }
 
+void ShowdData(vector<SPtr> const& shapes)
+{
+	for (size_t i = 0; i < shapes.size(); i++)
+	{
+		(*shapes[i].get()).ShowDate(cout);
+		cout << "Mass in water = "<< GetSubmergedWeight((*shapes[i].get()).GetDensity(), (*shapes[i].get()).GetVolume()) << endl;
+		cout << endl;
+	}
+}
+
 int main(int argc, char* argv[])
 {
-	vector<CBody> objects;
+	vector<SPtr> shapes;
+
 	if (argc == 1)
 	{
-		objects = InteractionWithTheUser(std::cin);
-		PrintLargestMassAndEasiestInWater(objects, std::cout);
+		AddShapes(std::cin, shapes);
 	}
 	else if (argc == 2 || argc == 3)
 	{
@@ -220,26 +249,26 @@ int main(int argc, char* argv[])
 			std::cout << "Could not open file" << endl;
 			return 1;
 		}
-		objects = InteractionWithTheUser(file);
+		AddShapes(file, shapes);
 		file.close();
 
 		if (argc == 3)
 		{
 			ofstream outFile(argv[2]);
-			PrintLargestMassAndEasiestInWater(objects, outFile);
+			PrintLargestMassAndEasiestInWater(shapes, outFile);
 			outFile.close();
 		}
 		else
 		{
-			PrintLargestMassAndEasiestInWater(objects, std::cout);
+			PrintLargestMassAndEasiestInWater(shapes, std::cout);
 		}
-		
 	}
 	else
 	{
-		std::cout << "wrong number of parameters" << std::endl;
+		cout << "incorrect number of parameters" << endl;
 		return 1;
 	}
 
+	//ShowdData(shapes);
 	return 0;
 }

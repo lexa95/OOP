@@ -10,8 +10,11 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include <boost/shared_ptr.hpp>
-#include "Body.h"
 
 
 // TODO: reference additional headers your program requires here
+
+#define BOOST_TEST_MODULE taskTest
+#define BOOST_TEST_INCLUDED
+#pragma warning (disable:4702)
+#include <boost/test/unit_test.hpp>
