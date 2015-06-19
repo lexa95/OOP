@@ -1,11 +1,13 @@
 #pragma once
+#include <stdexcept>
+#include <algorithm>
 
 template <class elemType>
 class CMyArray {
 public:
-	CMyArray() :m_size(0), m_data(0)
+	CMyArray() :m_size(0)
 	{
-		elemType * m_data = new  elemType[1];
+		m_data = new elemType[1];
 	};
 
 	CMyArray(CMyArray & obj)
@@ -21,14 +23,20 @@ public:
 
 	void Add(elemType value)
 	{
-		elemType * temp = new  elemType[m_size + 1];
-		for (int i = 0; i < m_size; i++)
+		elemType * temp = new elemType[m_size + 1];
+		for (size_t i = 0; i < m_size; i++)
 		{
 			temp[i] = m_data[i];
 		}
-		delete [] m_data;
-		
+		delete []m_data;
+		m_data = new elemType[m_size + 1];
+
 		m_data = temp;
+		for (size_t i = 0; i < m_size + 1; i++)
+		{
+			m_data[i] = temp[i];
+		}
+
 		m_data[m_size] = value;
 		m_size++;
 	};
@@ -38,14 +46,13 @@ public:
 		return m_size; 
 	}
 
-	elemType & operator [](int index)
+	elemType & operator [](size_t index)
 	{
 		if ((index >= 0) && (index < m_size))
 		{
-			return elemType(m_data[index]);
+			return m_data[index];
 		}
-		throw out_of_range("Выход за границы массива");
-		return m_data[0];
+		throw std::out_of_range("Выход за границы массива");
 	}
 	
 	CMyArray & operator = (const CMyArray & other)
@@ -59,10 +66,10 @@ public:
 		}
 	}
 
-	void Resize(int size)
+	void Resize(size_t size)
 	{
 		elemType * temp = new  elemType[size];
-		for (int i = 0; i < m_size; i++)
+		for (size_t i = 0; i < std::min(m_size, size); i++)
 		{
 			temp[i] = m_data[i];
 		}
@@ -70,7 +77,7 @@ public:
 		m_data = temp;
 
 		elemType value = elemType();
-		for (int i = m_size; i < size; i++)
+		for (size_t i = m_size; i < size; i++)
 		{
 			m_data[i] = value;
 		}
@@ -89,6 +96,6 @@ public:
 	};
 
 private:
-	int m_size;
-	elemType *m_data;
+	size_t m_size;
+	elemType * m_data;
 };

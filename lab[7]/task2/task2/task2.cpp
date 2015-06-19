@@ -4,14 +4,17 @@
 #include "stdafx.h"
 #include "CMyArray.h"
 #include <iostream>
+#include <string>
+#include <boost/shared_ptr.hpp>
 
 using namespace std;
 
 int main(int argc, char* argv[])
 {	
-	CMyArray<int> ar;
-	ar.Add(10);
-	cout << ar[0] << endl;
+	CMyArray<std::string> arr;
+	arr.Add("1234567890");
+	arr.Add("abcdifj");
+	cout << arr[0] << endl;
 	return 0;
 }
 

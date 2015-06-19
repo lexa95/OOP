@@ -18,7 +18,6 @@ public:
 	{
 	public:
 		Iterator(std::shared_ptr<StringList> &  element);
-		Iterator();
 
 		std::string & operator*();
 		std::shared_ptr<StringList> Get();

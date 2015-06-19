@@ -145,8 +145,6 @@ CMyStringList::Iterator::Iterator(std::shared_ptr<StringList> &  element)
 : m_element(element)
 {};
 
-CMyStringList::Iterator::Iterator(){};
-
 std::string & CMyStringList::Iterator::operator*()
 {
 	return m_element->value;
